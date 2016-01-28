@@ -35,7 +35,7 @@
   					<strong>Note from the Administrator:</strong> 
   					<ul style="margin-left:20px;">	
   						<li>This web app is currently running in Test Mode for demo and testing</li> 
-  						<li>Report Module and Documentation are still under construction</li>
+  						<li>Documentation are still under construction</li>
   					</ul>
 				</div>
 
@@ -47,7 +47,7 @@
 						<div class="tabbable">
 							<ul class="nav nav-tabs" id="formtab-nav">
 								<li class="active" id="first-tab"><a href="#tab1" data-toggle="tab"><i class="icon-align-justify"></i> General Reports</a></li>
-								<li id="second-tab"><a href="#tab2" data-toggle="tab"><i class="icon-align-justify"></i> Advanced</a></li>
+								<!--<li id="second-tab"><a href="#tab2" data-toggle="tab"><i class="icon-align-justify"></i> Advanced</a></li>-->
 							</ul>
 
 							<div class="tab-content" style="min-height:400px;">
@@ -59,8 +59,18 @@
 										</div>	
 
 										<ul style="margin-left:20px;">
-											<li><a href="reports_general_monthly.php">Monthly General Report</a></li>
-											<li><a href="reports_general_yearly.php">Yearly General Report</a></li>											
+											<li><a href="reports_general_in_store_all.php">In-Store Activities by Month (All Stores)</a></li>
+											<li><a href="reports_general_in_store_single_by_year.php">In-Store Activities by Year (Single Store)</a></li>
+											<li><a href="reports_general_in_store_single.php">In-Store Activities by Month (Single Store)</a></li>
+											<li><a href="reports_general_departments.php">Catalogue Booked Activity by Department</a></li>
+											<li><a href="reports_booking_by_supplier.php">Booking Activities By Supplier</a></li>
+											<li><a href="reports_general_catalogue.php">Catalogue by Month</a></li>
+											<li><a href="reports_general_newspaper.php">Newpaper by Month</a></li>
+											<li><a href="reports_general_email.php">4-YOU by Month</a></li>
+											<li><a href="reports_general_prep_school.php">PREP School by Month</a></li>
+
+											<!--<li><a href="reports_general_monthly.php">Monthly General Report</a></li>-->
+											<!--<li><a href="reports_general_yearly.php">Yearly General Report</a></li>-->
 										</ul>
 									</fieldset>	
 

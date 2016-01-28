@@ -7,11 +7,11 @@
  * 		
  * @Desc: Process file using Ajax
  **************************************************************************************************/
-session_start();
 include('../config.php');
 require_once('../lib/db.php');
 require_once('../lib/admin.php');
 require_once('../lib/html.php');
+session_start();
 
 $db = new DB();
 $admin = new ADMIN();
@@ -38,6 +38,7 @@ if ($_REQUEST['action'] == "add" && $_REQUEST['frm_activity_name'])
 											`activity_store_related`, 
 											`activity_active`, 
 											`size_id`, 
+											`year`, 
 											`activity_created_date`, 
 											`activity_created_by`, 
 											`activity_modified_date`, 
@@ -51,6 +52,7 @@ if ($_REQUEST['action'] == "add" && $_REQUEST['frm_activity_name'])
 						'" . mysql_real_escape_string($_REQUEST['frm_activity_store_related']) . "', 	
 						'" . mysql_real_escape_string($_REQUEST['frm_activity_active']) . "', 
 						'" . mysql_real_escape_string($_REQUEST['frm_size_id']) . "', 
+						'" . mysql_real_escape_string($_REQUEST['frm_year']) . "', 
 						'" . date('Y-m-d H:i:s') . "', 
 						'" . $_SESSION['user']['login_name'] . "',
 						'" . date('Y-m-d H:i:s') . "', 
@@ -122,6 +124,7 @@ elseif ($_REQUEST['action'] == "edit" && $_REQUEST['activity_id'])
 										  `activity_store_related` = '" . mysql_real_escape_string($_REQUEST['frm_activity_store_related']) . "', 
 										  `activity_active` = '" . mysql_real_escape_string($_REQUEST['frm_activity_active']) . "', 
 										  `size_id` = '" . mysql_real_escape_string($_REQUEST['frm_size_id']) . "', 
+										  `year` = '" . mysql_real_escape_string($_REQUEST['frm_year']) . "', 
 										  `activity_modified_date` = '" . date('Y-m-d H:i:s') . "', 
 										  `activity_modified_by` = '" . $_SESSION['user']['login_name'] . "' 
 								WHERE `activity_id` = '" . mysql_real_escape_string($_REQUEST['activity_id']) . "' 
@@ -227,9 +230,15 @@ elseif ($_REQUEST['action'] == "email_list")
 	if ($_REQUEST['frm_message']) 
 	{
 		$strMessage .= "<p><em>\"" . stripslashes($_REQUEST['frm_message']) . "\"</em></p><br />\n\n";
-	}	
+	}
 
-	$strMessage .= file_get_contents($STR_URL . 'activity_list_print.php?action=print');
+	if(isset($_REQUEST['year'])){
+		$intYear = $_REQUEST['year'];
+	}else{
+		$intYear  = date("Y");
+	}
+
+	$strMessage .= file_get_contents($STR_URL . 'activity_list_print.php?action=print&year='. $intYear);
 	
 
 	// From

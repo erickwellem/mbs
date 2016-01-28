@@ -67,6 +67,16 @@
 	
     <meta name="description" content="<?php echo stripslashes($arrSiteConfig['site_description']); ?>" /> 
 	<?php include('inc/init.php'); ?>
+    
+    <!-- Select2 jQuery Plugin -->
+    <link href="<?php echo $STR_URL; ?>css/select2-3.4.3/select2.css" rel="stylesheet"/>
+    <script src="<?php echo $STR_URL; ?>css/select2-3.4.3/select2.js"></script>
+    <script>
+		$(function(){
+			$("#frm_booking_product_code").select2({tags:[]});
+		})
+    </script>
+    <!-- Select2 jQuery Plugin -->
 
 	
 	<?php if ($_REQUEST['action'] == "add") { ?>
@@ -315,7 +325,7 @@
 							      <!-- Booking Code -->
 							      <label class="control-label" for="frm_booking_code">Code</label>
 							      <div class="controls">
-							        <input type="text" id="frm_booking_code" name="frm_booking_code" placeholder="Type Booking Code" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_code']) { echo stripslashes($_REQUEST['frm_booking_code']); } elseif (!$_REQUEST['frm_booking_code'] && $row['booking_code']) { echo stripslashes($row['booking_code']); } elseif (!$_REQUEST['frm_booking_code'] && !$row['booking_code']) { echo $strBookingCode; } ?>" data-validation="required" readonly="readonly" /> 
+							        <input type="text" id="frm_booking_code" name="frm_booking_code" placeholder="Type Booking Code" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_code']) { echo stripslashes($_REQUEST['frm_booking_code']); } elseif (!$_REQUEST['frm_booking_code'] && $row['booking_code']) { echo stripslashes($row['booking_code']); } elseif (!$_REQUEST['frm_booking_code'] && !$row['booking_code']) { echo $strBookingCode; } ?>" data-validation="required" readonly /> 
 							        <p class="help-block"></p>
 							        <div id="statusbox"></div>
 							      </div>
@@ -415,7 +425,7 @@
 										      		
 									<?php for ($i = intval(date('Y')); $i <= intval(date('Y') + 5); $i++) { ?>
 										<option value="<?php echo $i; ?>"<?php if ($rowActivity['booking_activity_year'] == $i) { echo " selected='selected'"; } elseif (date('n') <= 10 && $i == date("Y")) { echo " selected='selected'"; } elseif (date('n') > 10 && $i == date("Y")+1) { echo " selected='selected'"; } ?>><?php echo $i; ?></option>
-									<? } ?>
+									<?php } ?>
 									</select> * 							        
 								</div>
 							</div>		
@@ -449,7 +459,7 @@
 								<label class="control-label" for="frm_activity_id">Activity</label>
 								<div class="controls">
 								<?php $arrActivity = $db->getActivityData(); ?>
-								<?php $intCountInStore = $db->dbGetAggregateData('COUNT', 'mbs_activities', 'activity_store_related', "WHERE `activity_store_related` = 'yes'"); ?>
+								<?php $intCountInStore = $db->dbGetAggregateData('COUNT', 'mbs_activities', 'activity_store_related', "WHERE `year`= ".date("Y")." AND `activity_store_related` = 'yes'"); ?>
 
 									<select name="frm_activity_id" id="frm_activity_id" class="input-xlarge" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>required<?php } ?>">
 										<option value="">-- Please select --</option>
@@ -688,54 +698,104 @@
 
 					    	<div class="container-fluid" style="margin-bottom:20px;">
 					    		<div class="row-fluid">
-							    	<div class="span5">
+							    	<div class="span12">
 										<!-- Booking Activity Product Code -->
 										<label for="frm_booking_product_code">UPI Code</label>
-										<input type="text" id="frm_booking_product_code" name="frm_booking_product_code" placeholder="Type product code" class="input-medium" value="<?php if ($_REQUEST['frm_booking_product_code']) { echo stripslashes($_REQUEST['frm_booking_product_code']); } elseif (!$_REQUEST['frm_booking_product_code'] && $rowProduct['booking_product_code']) { echo stripslashes($rowProduct['booking_product_code']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>required<?php } ?>" /> *
+										<input type="hidden" id="frm_booking_product_code" name="frm_booking_product_code" placeholder="Type product code" class="input-xxlarge" value="<?php if ($_REQUEST['frm_booking_product_code']) { echo stripslashes($_REQUEST['frm_booking_product_code']); } elseif (!$_REQUEST['frm_booking_product_code'] && $rowProduct['booking_product_code']) { echo stripslashes($rowProduct['booking_product_code']); } ?>" data-validation="required" /> *
+										<p class="help-block">Type then enter. </p>
 									</div>
+                                </div>
+							</div>	    
 
-									<div class="span2"></div>
-
-							    	<div class="span4">
+							<div class="container-fluid" style="margin-bottom:20px;">
+					    		<div class="row-fluid">
+							    	<div class="span12">
 										<!-- Booking Activity Product Name -->
 										<label for="frm_booking_product_name">Name</label>										      		      	
-										<input type="text" id="frm_booking_product_name" name="frm_booking_product_name" placeholder="Type product name" class="input-medium" value="<?php if ($_REQUEST['frm_booking_product_name']) { echo stripslashes($_REQUEST['frm_booking_product_name']); } elseif (!$_REQUEST['frm_booking_product_name'] && $rowProduct['booking_product_name']) { echo stripslashes($rowProduct['booking_product_name']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>required<?php } ?>" /> *										        										      
+										<input type="text" id="frm_booking_product_name" name="frm_booking_product_name" placeholder="Type product name" class="input-xxlarge" value="<?php if ($_REQUEST['frm_booking_product_name']) { echo stripslashes($_REQUEST['frm_booking_product_name']); } elseif (!$_REQUEST['frm_booking_product_name'] && $rowProduct['booking_product_name']) { echo stripslashes($rowProduct['booking_product_name']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>required<?php } ?>" /> *										        										      
+									</div>
+								</div>
+							</div>
+                            
+                            <div class="container-fluid" style="margin-bottom:20px;">
+					    		<div class="row-fluid">
+							    	<div class="span12">
+										<!-- Booking Activity Product Name -->
+										<label for="frm_booking_department_id">Department</label>	
+                                        <?php $arrDepartments = $db->getDepartmentData(); ?>								
+                                            <select name="frm_booking_department_id" id="frm_booking_department_id" class="input-xxlarge" data-validation="required">
+                                                <option value="">-- Please select --</option>
+                                          <?php
+                                            if (is_array($arrDepartments) && count($arrDepartments) > 0)
+                                            {
+                                                foreach ($arrDepartments as $intDepartmentID=>$arrDepartmentData)
+                                                {
+                                                    echo "\n\t<option value=\"" . $intDepartmentID . "\"";  
+                                                    
+                                                    if ($_REQUEST['frm_booking_department_id'] && $_REQUEST['frm_booking_department_id'] == $intDepartmentID)
+                                                    {
+                                                        echo " selected=\"selected\"";
+                                                    }
+        
+                                                    elseif (!$_REQUEST['frm_booking_department_id'] && $row['booking_department_id'] == $intDepartmentID) {
+                                                        echo " selected=\"selected\"";
+                                                    }
+                                                    
+                                                    echo ">" . stripslashes($arrDepartmentData['department_name']) . "</option>";
+                                                }
+                                            }
+                                           ?>
+                                           </select> *									      		      	
 									</div>
 								</div>
 							</div>	    
 
 							<div class="container-fluid" style="margin-bottom:20px;">
 					    		<div class="row-fluid">
-							    	<div class="span5">
+							    	<div class="span12">
 										<!-- Booking Activity Product Normal Retail Price -->
 										<label for="frm_booking_product_normal_retail_price">Normal Retail Price $</label>										      
-										<input type="text" id="frm_booking_product_normal_retail_price" name="frm_booking_product_normal_retail_price" placeholder="0.00" class="input-medium" onblur="this.value=parseFloat(this.value).toFixed(2)" value="<?php if ($_REQUEST['frm_booking_product_normal_retail_price']) { echo stripslashes($_REQUEST['frm_booking_product_normal_retail_price']); } elseif (!$_REQUEST['frm_booking_product_normal_retail_price'] && $rowProduct['booking_product_normal_retail_price']) { echo stripslashes($rowProduct['booking_product_normal_retail_price']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>validate_float<?php } ?>" /> *
+										<input type="text" id="frm_booking_product_normal_retail_price" name="frm_booking_product_normal_retail_price" placeholder="0.00" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_product_normal_retail_price']) { echo stripslashes($_REQUEST['frm_booking_product_normal_retail_price']); } elseif (!$_REQUEST['frm_booking_product_normal_retail_price'] && $rowProduct['booking_product_normal_retail_price']) { echo stripslashes($rowProduct['booking_product_normal_retail_price']); } ?>" data-validation="required" /> *
 									</div>
-
-									<div class="span2"></div>
-
-							    	<div class="span4">
+								</div>
+							</div>
+                            
+                            <div class="container-fluid" style="margin-bottom:20px;">
+					    		<div class="row-fluid">
+							    	<div class="span12">
 										<!-- Booking Activity Product Promo Price -->
 										<label for="frm_booking_product_promo_price">Promo Price $</label>
-										<input type="text" id="frm_booking_product_promo_price" name="frm_booking_product_promo_price" placeholder="0.00" class="input-medium" onblur="this.value=parseFloat(this.value).toFixed(2)" value="<?php if ($_REQUEST['frm_booking_product_promo_price']) { echo stripslashes($_REQUEST['frm_booking_product_promo_price']); } elseif (!$_REQUEST['frm_booking_product_promo_price'] && $rowProduct['booking_product_promo_price']) { echo stripslashes($rowProduct['booking_product_promo_price']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>validate_float<?php } ?>" /> *
+										<input type="text" id="frm_booking_product_promo_price" name="frm_booking_product_promo_price" placeholder="0.00" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_product_promo_price']) { echo stripslashes($_REQUEST['frm_booking_product_promo_price']); } elseif (!$_REQUEST['frm_booking_product_promo_price'] && $rowProduct['booking_product_promo_price']) { echo stripslashes($rowProduct['booking_product_promo_price']); } ?>" data-validation="required" /> *
 									</div>
 								</div>
 							</div>
 
 							<div class="container-fluid" style="margin-bottom:20px;">
 					    		<div class="row-fluid">
-							    	<div class="span5">
+							    	<div class="span12">
 										<!-- Booking Activity Product Cost Price -->
 										<label for="frm_booking_product_cost_price">Cost Price $</label>										      
-										<input type="text" id="frm_booking_product_cost_price" name="frm_booking_product_cost_price" placeholder="0.00" class="input-medium" onblur="this.value=parseFloat(this.value).toFixed(2)" value="<?php if ($_REQUEST['frm_booking_product_cost_price']) { echo stripslashes($_REQUEST['frm_booking_product_cost_price']); } elseif (!$_REQUEST['frm_booking_product_cost_price'] && $rowProduct['booking_product_cost_price']) { echo stripslashes($rowProduct['booking_product_cost_price']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>validate_float<?php } ?>" /> *
+										<input type="text" id="frm_booking_product_cost_price" name="frm_booking_product_cost_price" placeholder="0.00" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_product_cost_price']) { echo stripslashes($_REQUEST['frm_booking_product_cost_price']); } elseif (!$_REQUEST['frm_booking_product_cost_price'] && $rowProduct['booking_product_cost_price']) { echo stripslashes($rowProduct['booking_product_cost_price']); } ?>" data-validation="required" /> *
 									</div>
-
-									<div class="span2"></div>
-
-							    	<div class="span4">
+								</div>
+							</div>
+                            
+                            <div class="container-fluid" style="margin-bottom:20px;">
+					    		<div class="row-fluid">
+							    	<div class="span12">
 										<!-- Booking Activity Product Recommended Retail Price -->
 										<label for="frm_booking_product_recommended_retail_price">RRP $</label>
-										<input type="text" id="frm_booking_product_recommended_retail_price" name="frm_booking_product_recommended_retail_price" placeholder="0.00" class="input-medium" onblur="this.value=parseFloat(this.value).toFixed(2)" value="<?php if ($_REQUEST['frm_booking_product_recommended_retail_price']) { echo stripslashes($_REQUEST['frm_booking_product_recommended_retail_price']); } elseif (!$_REQUEST['frm_booking_product_recommended_retail_price'] && $rowProduct['booking_product_recommended_retail_price']) { echo stripslashes($rowProduct['booking_product_recommended_retail_price']); } ?>" data-validation="<?php if ($_REQUEST['action'] == "add" && !$_REQUEST['booking_id']) { ?>validate_float<?php } ?>" /> *
+										<input type="text" id="frm_booking_product_recommended_retail_price" name="frm_booking_product_recommended_retail_price" placeholder="0.00" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_product_recommended_retail_price']) { echo stripslashes($_REQUEST['frm_booking_product_recommended_retail_price']); } elseif (!$_REQUEST['frm_booking_product_recommended_retail_price'] && $rowProduct['booking_product_recommended_retail_price']) { echo stripslashes($rowProduct['booking_product_recommended_retail_price']); } ?>" data-validation="required" /> *
+									</div>
+								</div>
+							</div>
+                            
+                            <div class="container-fluid" style="margin-bottom:20px;">
+					    		<div class="row-fluid">
+							    	<div class="span12">
+										<!-- Booking Activity Product Recommended Retail Price -->
+										<label for="frm_booking_product_discount">Discount %</label>
+										<input type="text" id="frm_booking_product_discount" name="frm_booking_product_discount" placeholder="0.00" class="input-xlarge" value="<?php if ($_REQUEST['frm_booking_product_discount']) { echo stripslashes($_REQUEST['frm_booking_product_discount']); } elseif (!$_REQUEST['frm_booking_product_discount'] && $rowProduct['booking_product_discount']) { echo stripslashes($rowProduct['booking_product_discount']); } ?>" />
 									</div>
 								</div>
 							</div>
@@ -745,7 +805,7 @@
 							    	<div class="span12">
 										<!-- Booking Activity Product Special Offer Details -->
 										<label for="frm_booking_product_special_offer_details">Special Offer Details</label>
-										<textarea id="frm_booking_product_special_offer_details" name="frm_booking_product_special_offer_details" placeholder="Type special offer details" class="input-xxlarge" rows="3"><?php if ($_REQUEST['frm_booking_product_special_offer_details']) { echo stripslashes($_REQUEST['frm_booking_product_special_offer_details']); } elseif (!$_REQUEST['frm_booking_product_special_offer_details'] && $rowProduct['booking_product_special_offer_details']) { echo stripslashes($rowProduct['booking_product_special_offer_details']); } ?></textarea> *
+										<textarea id="frm_booking_product_special_offer_details" name="frm_booking_product_special_offer_details" placeholder="Type special offer details" class="input-xxlarge" rows="3"><?php if ($_REQUEST['frm_booking_product_special_offer_details']) { echo stripslashes($_REQUEST['frm_booking_product_special_offer_details']); } elseif (!$_REQUEST['frm_booking_product_special_offer_details'] && $rowProduct['booking_product_special_offer_details']) { echo stripslashes($rowProduct['booking_product_special_offer_details']); } ?></textarea>
 									</div>
 							    					
 								</div>
@@ -816,6 +876,29 @@
 					trigger: 'hover',
 					placement: 'top'
 				});
+				
+				var pricefrist='';
+				var pricelast='';
+				$('#frm_booking_activity_price').focus(function(){
+				  pricefrist = $('#frm_booking_activity_price').val();
+				
+				});
+				$('#frm_booking_activity_price').blur(function(){
+				  pricelast = $('#frm_booking_activity_price').val();
+				 if(pricelast!=pricefrist)
+				 {
+				 
+				  var stat = confirm('Are you sure want to change the price '+pricefrist+' to '+pricelast+' ?');
+				  if(stat==true)
+				  {
+				   $('#frm_booking_activity_price').val(pricelast);
+				  }
+				  else
+				  {
+				   $('#frm_booking_activity_price').val(pricefrist);
+				  }
+				 }
+				});
 
 				
 
@@ -839,7 +922,7 @@
 						$('#third-tab').hide(); //-- show the third tab
 						<?php } ?>
 
-						$('#frm_preview').load('ajax/booking_activity_preview.php?booking_id=<?php echo $_REQUEST['booking_id']; ?>'); //-- Load the preview table
+						$('#frm_preview').load('ajax/booking_activity_preview.php?booking_id=<?php echo $_REQUEST['booking_id']; ?>&action=edit'); //-- Load the preview table
 						$('#button-finish').attr('href', '<?php echo $STR_URL; ?>booking_view.php?booking_id=<?php echo $_REQUEST['booking_id']; ?>&action=view'); //-- Update the url for the finish button
 						
 						$('#frm_add_activity').click(function() { //-- Take the user to the second tab if he/she wants to add more activities
@@ -866,14 +949,14 @@
 
 							$('#frm_booking_activity_year').val(arr_activities[0]['booking_activity_year']);
 							$('#frm_booking_activity_month').val(arr_activities[0]['booking_activity_month']);
-							$('#frm_activity_id').val(arr_activities[0]['activity_id']);
+							$('#frm_activity_id').val(arr_activities[0]['activity_id']).trigger('change');
 							$('#frm_booking_activity_price').val(arr_activities[0]['booking_activity_price']);
 							$('#frm_booking_activity_id').val(arr_activities[0]['booking_activity_id']);
 							$('#frm_activity_nav').html('<strong>1 of ' + arr_activities.length + '</strong>');
 							$('#frm_get_activity_prev').attr('disabled', 'disabled'); 
 							if (parseInt(arr_activities.length) == 1) { $('#frm_get_activity_next').attr('disabled', 'disabled'); }
 							//-- alert($('#frm_booking_activity_id').val());
-
+							
 							//-- Process the Products
 							var booking_activity_id = $('#frm_booking_activity_id').val();
 							//-- alert(booking_activity_id);
@@ -886,11 +969,14 @@
 
 								$('#frm_product_amount').val(parseInt(arr_products.length));
 								$('#frm_booking_product_id').val(arr_products[0]['booking_product_id']);
-								$('#frm_booking_product_code').val(arr_products[0]['booking_product_code']);
+								$('#frm_booking_department_id').val(arr_products[0]['booking_department_id']);
+								//$('#frm_booking_product_code').val(arr_products[0]['booking_product_code']);
+								$('#frm_booking_product_code').select2("val", arr_products[0]['booking_product_code'].split(","));
 								$('#frm_booking_product_name').val(arr_products[0]['booking_product_name']);
 								$('#frm_booking_product_normal_retail_price').val(arr_products[0]['booking_product_normal_retail_price']);
 								$('#frm_booking_product_promo_price').val(arr_products[0]['booking_product_promo_price']);
 								$('#frm_booking_product_cost_price').val(arr_products[0]['booking_product_cost_price']);
+								$('#frm_booking_product_discount').val(arr_products[0]['booking_product_discount']);
 								$('#frm_booking_product_recommended_retail_price').val(arr_products[0]['booking_product_recommended_retail_price']);
 								$('#frm_booking_product_special_offer_details').val(arr_products[0]['booking_product_special_offer_details']);
 								$('#frm_product_nav').html('<strong>1 of ' + arr_products.length + '</strong>');
@@ -923,7 +1009,7 @@
 								
 								$('#frm_booking_activity_year').val(arr_activities[int_activities_offset]['booking_activity_year']);
 								$('#frm_booking_activity_month').val(arr_activities[int_activities_offset]['booking_activity_month']);
-								$('#frm_activity_id').val(arr_activities[int_activities_offset]['activity_id']);
+								$('#frm_activity_id').val(arr_activities[int_activities_offset]['activity_id']).trigger('change');
 								$('#frm_booking_activity_price').val(arr_activities[int_activities_offset]['booking_activity_price']);
 								$('#frm_booking_activity_id').val(arr_activities[int_activities_offset]['booking_activity_id']);
 								$('#frm_activity_nav').html('<strong>' + (parseInt(int_activities_offset)+1) + ' of ' + arr_activities.length + '</strong>');								
@@ -951,11 +1037,14 @@
 									var int_product_offset = $('#frm_product_offset').val();
 
 									$('#frm_booking_product_id').val(arr_products[0]['booking_product_id']);
-									$('#frm_booking_product_code').val(arr_products[0]['booking_product_code']);
+									$('#frm_booking_department_id').val(arr_products[0]['booking_department_id']);
+									//$('#frm_booking_product_code').val(arr_products[0]['booking_product_code']);
+									$('#frm_booking_product_code').select2("val", arr_products[0]['booking_product_code'].split(","));
 									$('#frm_booking_product_name').val(arr_products[0]['booking_product_name']);
 									$('#frm_booking_product_normal_retail_price').val(arr_products[0]['booking_product_normal_retail_price']);
 									$('#frm_booking_product_promo_price').val(arr_products[0]['booking_product_promo_price']);
 									$('#frm_booking_product_cost_price').val(arr_products[0]['booking_product_cost_price']);
+									$('#frm_booking_product_discount').val(arr_products[0]['booking_product_discount']);
 									$('#frm_booking_product_recommended_retail_price').val(arr_products[0]['booking_product_recommended_retail_price']);
 									$('#frm_booking_product_special_offer_details').val(arr_products[0]['booking_product_special_offer_details']);
 									
@@ -990,7 +1079,7 @@
 								
 								$('#frm_booking_activity_year').val(arr_activities[int_activities_offset]['booking_activity_year']);
 								$('#frm_booking_activity_month').val(arr_activities[int_activities_offset]['booking_activity_month']);
-								$('#frm_activity_id').val(arr_activities[int_activities_offset]['activity_id']);
+								$('#frm_activity_id').val(arr_activities[int_activities_offset]['activity_id']).trigger('change');
 								$('#frm_booking_activity_price').val(arr_activities[int_activities_offset]['booking_activity_price']);
 								$('#frm_booking_activity_id').val(arr_activities[int_activities_offset]['booking_activity_id']);
 								$('#frm_activity_nav').html('<strong>' + (parseInt(int_activities_offset)+1) + ' of ' + arr_activities.length + '</strong>');
@@ -1018,11 +1107,14 @@
 									var int_product_offset = $('#frm_product_offset').val();
 
 									$('#frm_booking_product_id').val(arr_products[0]['booking_product_id']);
-									$('#frm_booking_product_code').val(arr_products[0]['booking_product_code']);
+									$('#frm_booking_department_id').val(arr_products[0]['booking_department_id']);
+									//$('#frm_booking_product_code').val(arr_products[0]['booking_product_code']);
+									$('#frm_booking_product_code').select2("val", arr_products[0]['booking_product_code'].split(","));
 									$('#frm_booking_product_name').val(arr_products[0]['booking_product_name']);
 									$('#frm_booking_product_normal_retail_price').val(arr_products[0]['booking_product_normal_retail_price']);
 									$('#frm_booking_product_promo_price').val(arr_products[0]['booking_product_promo_price']);
 									$('#frm_booking_product_cost_price').val(arr_products[0]['booking_product_cost_price']);
+									$('#frm_booking_product_discount').val(arr_products[0]['booking_product_discount']);
 									$('#frm_booking_product_recommended_retail_price').val(arr_products[0]['booking_product_recommended_retail_price']);
 									$('#frm_booking_product_special_offer_details').val(arr_products[0]['booking_product_special_offer_details']);
 									
@@ -1060,11 +1152,14 @@
 
 								$('#frm_product_seq').val(parseInt(int_product_offset)+1);
 								$('#frm_booking_product_id').val(arr_products[int_product_offset]['booking_product_id']);
-								$('#frm_booking_product_code').val(arr_products[int_product_offset]['booking_product_code']);
+								$('#frm_booking_department_id').val(arr_products[int_product_offset]['booking_department_id']);
+								//$('#frm_booking_product_code').val(arr_products[int_product_offset]['booking_product_code']);
+								$('#frm_booking_product_code').select2("val", arr_products[int_product_offset]['booking_product_code'].split(","));
 								$('#frm_booking_product_name').val(arr_products[int_product_offset]['booking_product_name']);
 								$('#frm_booking_product_normal_retail_price').val(arr_products[int_product_offset]['booking_product_normal_retail_price']);
 								$('#frm_booking_product_promo_price').val(arr_products[int_product_offset]['booking_product_promo_price']);
 								$('#frm_booking_product_cost_price').val(arr_products[int_product_offset]['booking_product_cost_price']);
+								$('#frm_booking_product_discount').val(arr_products[int_product_offset]['booking_product_discount']);
 								$('#frm_booking_product_recommended_retail_price').val(arr_products[int_product_offset]['booking_product_recommended_retail_price']);
 								$('#frm_booking_product_special_offer_details').val(arr_products[int_product_offset]['booking_product_special_offer_details']);
 								
@@ -1102,11 +1197,14 @@
 
 								$('#frm_product_seq').val(parseInt(int_product_offset)+1);
 								$('#frm_booking_product_id').val(arr_products[int_product_offset]['booking_product_id']);
-								$('#frm_booking_product_code').val(arr_products[int_product_offset]['booking_product_code']);
+								$('#frm_booking_department_id').val(arr_products[int_product_offset]['booking_department_id']);
+								//$('#frm_booking_product_code').val(arr_products[int_product_offset]['booking_product_code']);
+								$('#frm_booking_product_code').select2("val", arr_products[int_product_offset]['booking_product_code'].split(","));
 								$('#frm_booking_product_name').val(arr_products[int_product_offset]['booking_product_name']);
 								$('#frm_booking_product_normal_retail_price').val(arr_products[int_product_offset]['booking_product_normal_retail_price']);
 								$('#frm_booking_product_promo_price').val(arr_products[int_product_offset]['booking_product_promo_price']);
 								$('#frm_booking_product_cost_price').val(arr_products[int_product_offset]['booking_product_cost_price']);
+								$('#frm_booking_product_discount').val(arr_products[int_product_offset]['booking_product_discount']);
 								$('#frm_booking_product_recommended_retail_price').val(arr_products[int_product_offset]['booking_product_recommended_retail_price']);
 								$('#frm_booking_product_special_offer_details').val(arr_products[int_product_offset]['booking_product_special_offer_details']);
 								
@@ -1135,8 +1233,10 @@
 	      			changeYear: true,
 	      			dateFormat: "dd-mm-yy"	      			
 	    		}).val(getTodaysDate(0));
+				
+				
 
-	    		function getTodaysDate (val) 
+	    		function getTodaysDate(val) 
 	    		{
 				    var t = new Date, day, month, year = t.getFullYear();
 				    if (t.getDate() < 10) {
@@ -1254,7 +1354,8 @@
 					<?php } ?>	
 					) 
 					{ 
-						$('#control-store-id').load('ajax/booking_activity_instore_check.php?activity_id=' + activity_id + '&year=' + stryear + '&month=' + strmonth); 
+						//$('#control-store-id').load('ajax/booking_activity_instore_check.php?activity_id=' + activity_id + '&year=' + stryear + '&month=' + strmonth); 
+						$('#control-store-id').load('ajax/booking_check_gondola.php?activity_id=' + activity_id + '&year=' + stryear + '&month=' + strmonth); 
 						$('#control-store-id').show(); 
 					} 
 
@@ -1296,29 +1397,85 @@
 					<?php } ?>	
 
 					$('#control-booking-activity-price').show(500);
+					
+					var currentSelect = $(this);
+					var textOption = currentSelect.find("option:selected").html();
+					var contains = (textOption.indexOf('Gondola End') > -1) && (textOption.indexOf('Supplier Merchandised') > -1); 
+					
+					if(contains){
+						currentSelect.after('<img class="loadingImg" src="<?php echo $STR_URL; ?>img/loading.gif">');
+						$.ajax({
+							url : "ajax/supplier_check_contact.php",
+							data: {supplier_id : $("#frm_supplier_id").val()},
+							dataType:"json",
+							success: function(rs){
+								if(rs.status == 0){
+									var string = '<p>Please fill in the column name, phone, and email on the supplier table.<p><a href="supplier.php?supplier_id='+$("#frm_supplier_id").val()+'&action=edit&tab=2" class="btn btn-info" target="_blank">Click here</a>';
+									$("#modalBody").html(string);
+									$("#modalContainer").modal("show");
+								}
+								currentSelect.next("img").remove();
+							}
+						});
+					}
 
+					var containsCatalogue = (textOption.indexOf('Catalogue') > -1);
+					if(containsCatalogue){
+						currentSelect.after('<img class="loadingImg" src="<?php echo $STR_URL; ?>img/loading.gif">');
+						$.ajax({
+							url : "ajax/supplier_check_catalogue_stock.php",
+							data: {supplier_id : $("#frm_supplier_id").val(), text:textOption, year:stryear, month:strmonth},
+							dataType:"json",
+							success: function(rs){
+								if(rs.status == 0){
+									var string = '<p>Stock is full for this catalogue. Please select another one.</p>';
+									$("#modalBody").html(string);
+									$("#modalContainer").modal("show");
+									currentSelect.val("");
+								}
+								currentSelect.next("img").remove();
+							}
+						});
+					}
+					
 				});
-
-
-
+				
+				$('#frm_booking_activity_month').on('change', function(){
+					$("#frm_activity_id").trigger('change');
+				});
+				$('#frm_booking_activity_year').on('change', function(){
+					$("#frm_activity_id").trigger('change');
+				});
+				
+				var mode = 1;
 				//-- Submit the form: declare all variables sent to the database and then reset the form
 				$('.btn-submit').click(function() { 
 					var button_id = this.id;
 					
 					if (button_id == 'frm_add_product')
 					{
-						alert('Seq = ' + $('#frm_product_seq').val() + ', Amount = ' + $('#frm_product_amount').val());
-						/*
+						//-- alert('Seq = ' + $('#frm_product_seq').val() + ', Amount = ' + $('#frm_product_amount').val());
+						
 						var prod_seq = parseInt($('#frm_product_seq').val());
-					
+						
 						$('#frm_booking_action_btn').val('frm_add_product');
-						$('#child_action').val('add-product');
+						
+						<?php if ($_REQUEST['action'] == 'edit' && $_REQUEST['booking_id']) { ?>
+							if(mode == 1){
+								$('#child_action').val('edit-product');
+								mode=2;	
+							}else{
+								$('#child_action').val('add-product');
+							}
+						<?php } else { ?>
+							$('#child_action').val('add-product');
+						<?php } ?>
 						submitFormBooking();
 						prod_seq = parseInt(prod_seq + 1);
 						$('#frm_product_seq').val(prod_seq);
-						*/
+						
 						/*--alert($('#frm_booking_id_alt').val() + ', ' + $('#frm_booking_activity_id_alt').val() + ', ' + $('#frm_booking_product_id_alt').val());	*/
-						/*
+						
 						if ($('#frm_booking').validate())
 						{
 							clearProduct();	
@@ -1327,7 +1484,7 @@
 						<?php if ($_REQUEST['action'] == 'edit' && $_REQUEST['booking_id']) { ?>
 							$('#frm_product_nav').html('<strong>' + prod_seq + ' of ' + prod_seq + '</strong>');
 						<?php } ?>	
-						*/
+						
 					}
 					//-- For Submit button
 					else
@@ -1337,7 +1494,14 @@
 						{
 
 						}
-
+							
+						<?php if ($_REQUEST['action'] == 'edit' && $_REQUEST['booking_id']) { ?>
+							if(mode == 1){
+								$('#child_action').val('edit-product');	
+							}else{
+								$('#child_action').val('add-product');
+							}
+						<?php } ?>
 
 						submitFormBooking();
 						
@@ -1396,9 +1560,11 @@
 		    			var frm_product_seq = $('#frm_product_seq').val();
 		    			var frm_booking_product_code = $('#frm_booking_product_code').val();
 		    			var frm_booking_product_name = $('#frm_booking_product_name').val();
+						var frm_booking_department_id = $('#frm_booking_department_id').val();
 		    			var frm_booking_product_normal_retail_price = $('#frm_booking_product_normal_retail_price').val();
 		    			var frm_booking_product_promo_price = $('#frm_booking_product_promo_price').val();
 		    			var frm_booking_product_cost_price = $('#frm_booking_product_cost_price').val();
+		    			var frm_booking_product_discount = $('#frm_booking_product_discount').val();
 		    			var frm_booking_product_recommended_retail_price = $('#frm_booking_product_recommended_retail_price').val();
 		      			var frm_booking_product_special_offer_details = $('#frm_booking_product_special_offer_details').val();
 
@@ -1422,9 +1588,9 @@
 						dataString += "&frm_booking_code=" + frm_booking_code + "&frm_booking_name=" + frm_booking_name + "&frm_booking_supplier_po_ref_number=" + frm_booking_supplier_po_ref_number;
 						dataString += "&frm_supplier_id=" + frm_supplier_id + "&frm_booking_date=" + frm_booking_date + "&frm_booking_activity_year=" + frm_booking_activity_year;
 						dataString += "&frm_booking_activity_month=" + frm_booking_activity_month + "&frm_activity_id=" + frm_activity_id + "&frm_store_id=" + frm_store_id + "&frm_size_id=" + frm_size_id;
-						dataString += "&frm_booking_activity_price=" + frm_booking_activity_price + "&frm_product_seq=" + frm_product_seq + "&frm_booking_product_code=" + frm_booking_product_code + "&frm_booking_product_name=" + frm_booking_product_name;
+						dataString += "&frm_booking_activity_price=" + frm_booking_activity_price + "&frm_product_seq=" + frm_product_seq + "&frm_booking_product_code=" + frm_booking_product_code + "&frm_booking_product_name=" + frm_booking_product_name + "&frm_booking_department_id=" + frm_booking_department_id;
 						dataString += "&frm_booking_product_normal_retail_price=" + frm_booking_product_normal_retail_price + "&frm_booking_product_promo_price=" + frm_booking_product_promo_price;
-						dataString += "&frm_booking_product_cost_price=" + frm_booking_product_cost_price + "&frm_booking_product_recommended_retail_price=" + frm_booking_product_recommended_retail_price;
+						dataString += "&frm_booking_product_cost_price=" + frm_booking_product_cost_price + "&frm_booking_product_recommended_retail_price=" + frm_booking_product_recommended_retail_price + "&frm_booking_product_discount=" + frm_booking_product_discount;
 						dataString += "&frm_booking_product_special_offer_details=" + frm_booking_product_special_offer_details + "&frm_booking_id_alt=" + frm_booking_id_alt + "&frm_booking_action_btn=" + frm_booking_action_btn;
 						dataString += "&frm_booking_activity_id_alt=" + frm_booking_activity_id_alt + "&frm_booking_product_id_alt=" + frm_booking_product_id_alt + "&child_action=" + child_action;
 		      				   
@@ -1486,7 +1652,7 @@
 								
 								<?php if ($_REQUEST['action'] == 'edit' && $_REQUEST['booking_id']) { ?>
 								$('#button-finish').attr('href', '<?php echo $STR_URL; ?>booking_view.php?booking_id=<?php echo $_REQUEST['booking_id']; ?>&action=view');
-								$('#frm_preview').load('ajax/booking_activity_preview.php?booking_id=<?php echo $_REQUEST['booking_id']; ?>');
+								$('#frm_preview').load('ajax/booking_activity_preview.php?booking_id=<?php echo $_REQUEST['booking_id']; ?>&action=edit');
 								<?php } else { ?>	
 								$('#button-finish').attr('href', '<?php echo $STR_URL; ?>booking_view.php?booking_id=' + intID + '&action=view');
 								$('#frm_preview').load('ajax/booking_activity_preview.php?booking_id=' + intID);
@@ -1546,11 +1712,13 @@
 					$('#control-booking-activity-price').hide();
 					
 					$('#frm_product_seq').val(1);
+					$('#frm_booking_department_id').val('');
 					$('#frm_booking_product_name').val('');
-					$('#frm_booking_product_code').val('');
+					$('#frm_booking_product_code').select2('val',[]);
 					$('#frm_booking_product_normal_retail_price').val('');
 					$('#frm_booking_product_promo_price').val('');
 					$('#frm_booking_product_cost_price').val('');
+					$('#frm_booking_product_discount').val('');
 					$('#frm_booking_product_recommended_retail_price').val('');
 					$('#frm_booking_product_special_offer_details').val('');
 
@@ -1574,11 +1742,13 @@
 
 				function clearProduct()
 				{					
+					$('#frm_booking_department_id').val('');
 					$('#frm_booking_product_name').val('');
-					$('#frm_booking_product_code').val('');
+					$('#frm_booking_product_code').select2('val',[]);
 					$('#frm_booking_product_normal_retail_price').val('');
 					$('#frm_booking_product_promo_price').val('');
 					$('#frm_booking_product_cost_price').val('');
+					$('#frm_booking_product_discount').val('');
 					$('#frm_booking_product_recommended_retail_price').val('');
 					$('#frm_booking_product_special_offer_details').val('');
 				

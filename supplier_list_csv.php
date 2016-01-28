@@ -57,7 +57,7 @@
 		{
 			$uploadfile = $uploaddir . substr_replace($_REQUEST['frm_file'], '', 0, 12);
 						
-			move_uploaded_file($_FILES['frm_file']['tmp_name'], $uploadfile);			
+			//move_uploaded_file($_FILES['frm_file']['tmp_name'], $uploadfile);			copy($_FILES['frm_file']['tmp_name'], $uploadfile);
 
 			// determine separator ; or ,
 			$arrFile = file($uploadfile);
@@ -75,90 +75,92 @@
 			$handle = fopen($uploadfile, "r");
 			while (($data = fgetcsv($handle, 3000, $strSeparator)) !== FALSE) 
 			{
-				$row++;
-			    $num = count($data);
-			    #echo $row . " == " . $num . "<br />";
-			    if ($row > 1) 
-			    {
-			    	/*
-			    	echo "<p> $num fields in line $row:</p>\n";
-			    	echo "NO.: " . $data[0] . "<br />";
-			    	echo "NAME: " . $data[1] . "<br />";
-			    	echo "EMAIL: " . $data[2] . "<br />";
-			    	echo "TELEPHONE: " . $data[3] . "<br />";
-			    	echo "ADDRESS: " . $data[4] . "<br />";
-			    	echo "REF. NUMBER: " . $data[5] . "<br />";
-			    	echo "ACCOUNT NAME: " . $data[6] . "<br />";
-			    	echo "ACCOUNT EMAIL: " . $data[7] . "<br />";
-			    	echo "ACCOUNT PHONE: " . $data[8] . "<br />";
-			    	echo "ACCOUNT ADDRESS: " . $data[9] . "<br />";
-			    	echo "MARKETING NAME: " . $data[10] . "<br />";
-			    	echo "MARKETING EMAIL: " . $data[11] . "<br />";
-			    	echo "MARKETING PHONE: " . $data[12] . "<br />";
-			    	echo "MARKETING ADDRESS: " . $data[13] . "<br />";
-			    	*/
+				if (strlen($data[1]) > 0)
+				{	
+					$row++;
+				    $num = count($data);
+				    #echo $row . " == " . $num . "<br />";
+				    if ($row > 1) 
+				    {
+				    	/*
+				    	echo "<p> $num fields in line $row:</p>\n";
+				    	echo "NO.: " . $data[0] . "<br />";
+				    	echo "NAME: " . $data[1] . "<br />";
+				    	echo "EMAIL: " . $data[2] . "<br />";
+				    	echo "TELEPHONE: " . $data[3] . "<br />";
+				    	echo "ADDRESS: " . $data[4] . "<br />";
+				    	echo "REF. NUMBER: " . $data[5] . "<br />";
+				    	echo "ACCOUNT NAME: " . $data[6] . "<br />";
+				    	echo "ACCOUNT EMAIL: " . $data[7] . "<br />";
+				    	echo "ACCOUNT PHONE: " . $data[8] . "<br />";
+				    	echo "ACCOUNT ADDRESS: " . $data[9] . "<br />";
+				    	echo "MARKETING NAME: " . $data[10] . "<br />";
+				    	echo "MARKETING EMAIL: " . $data[11] . "<br />";
+				    	echo "MARKETING PHONE: " . $data[12] . "<br />";
+				    	echo "MARKETING ADDRESS: " . $data[13] . "<br />";
+				    	*/
 
 
-			    	// filter input: NAME -> `supplier_name`
-			    	// filter input: EMAIL -> `supplier_email`
-					// filter input: TELEPHONE -> `supplier_phone_number`
-					// filter input: ADDRESS -> `supplier_postal_address`
-					// filter input: REF. NUMBER -> `supplier_po_ref_number`
-					// filter input: ACCOUNT NAME -> `supplier_account_name`
-					// filter input: ACCOUNT EMAIL -> `supplier_account_email`
-					// filter input: ACCOUNT PHONE -> `supplier_account_phone_number`
-					// filter input: ACCOUNT ADDRESS -> `supplier_account_postal_address`
-					// filter input: MARKETING NAME -> `supplier_contact_name`
-					// filter input: MARKETING EMAIL -> `supplier_contact_email`
-					// filter input: MARKETING PHONE -> `supplier_contact_phone_number`
-					// filter input: MARKETING ADDRESS -> `supplier_contact_postal_address`
-					
-					
-					// check if the number exists, delete and then insert the latest as an update
-					$queryCheck = "SELECT COUNT(`supplier_name`) FROM `mbs_suppliers` 
-								   WHERE `supplier_name` = '" . trim($data[1]) . "'";
-					
-					$resultCheck = mysql_query($queryCheck);
-					$rowCheck = mysql_fetch_row($resultCheck);
+				    	// filter input: NAME -> `supplier_name`
+				    	// filter input: EMAIL -> `supplier_email`
+						// filter input: TELEPHONE -> `supplier_phone_number`
+						// filter input: ADDRESS -> `supplier_postal_address`
+						// filter input: REF. NUMBER -> `supplier_po_ref_number`
+						// filter input: ACCOUNT NAME -> `supplier_account_name`
+						// filter input: ACCOUNT EMAIL -> `supplier_account_email`
+						// filter input: ACCOUNT PHONE -> `supplier_account_phone_number`
+						// filter input: ACCOUNT ADDRESS -> `supplier_account_postal_address`
+						// filter input: MARKETING NAME -> `supplier_contact_name`
+						// filter input: MARKETING EMAIL -> `supplier_contact_email`
+						// filter input: MARKETING PHONE -> `supplier_contact_phone_number`
+						// filter input: MARKETING ADDRESS -> `supplier_contact_postal_address`
+						
+						
+						// check if the number exists, delete and then insert the latest as an update
+						$queryCheck = "SELECT COUNT(`supplier_name`) FROM `mbs_suppliers` 
+									   WHERE `supplier_name` = '" . trim($data[1]) . "'";
+						
+						$resultCheck = mysql_query($queryCheck);
+						$rowCheck = mysql_fetch_row($resultCheck);
 
-					$countCheck = $rowCheck[0];
+						$countCheck = $rowCheck[0];
 
-					if ($countCheck == 0)
-					{
-						// insert supplier
-						$query = "INSERT INTO `mbs_suppliers` (`supplier_id`, 
-															   `supplier_name`, 
-															   `supplier_email`, 
-															   `supplier_phone_number`, 
-															   `supplier_postal_address`, 
-															   `supplier_po_ref_number`, 
-															   `supplier_active`, 
-															   `supplier_created_date`, 
-															   `supplier_created_by`, 
-															   `supplier_modified_date`, 
-															   `supplier_modified_by`)
-														
-														VALUES (NULL , 
-																'" . mysql_real_escape_string($data[1]) . "', 	
-																'" . mysql_real_escape_string(strtolower($data[2])) . "', 
-																'" . mysql_real_escape_string($data[3]) . "', 
-																'" . mysql_real_escape_string($data[4]) . "', 																 
-																'" . mysql_real_escape_string($data[5]) . "', 
-																'yes', 																
-																'" . date('Y-m-d H:i:s') . "', 
-																'" . addslashes($_SESSION['user']['login_name']) . " (imported)', 
-																'" . date('Y-m-d H:i:s') . "', 
-																'" . addslashes($_SESSION['user']['login_name']) . " (imported)'
-																)";
+						if ($countCheck == 0)
+						{
+							// insert supplier
+							$query = "INSERT INTO `mbs_suppliers` (`supplier_id`, 
+																   `supplier_name`, 
+																   `supplier_email`, 
+																   `supplier_phone_number`, 
+																   `supplier_postal_address`, 
+																   `supplier_po_ref_number`, 
+																   `supplier_active`, 
+																   `supplier_created_date`, 
+																   `supplier_created_by`, 
+																   `supplier_modified_date`, 
+																   `supplier_modified_by`)
+															
+															VALUES (NULL , 
+																	'" . mysql_real_escape_string($data[1]) . "', 	
+																	'" . mysql_real_escape_string(strtolower($data[2])) . "', 
+																	'" . mysql_real_escape_string($data[3]) . "', 
+																	'" . mysql_real_escape_string($data[4]) . "', 																 
+																	'" . mysql_real_escape_string($data[5]) . "', 
+																	'yes', 																
+																	'" . date('Y-m-d H:i:s') . "', 
+																	'" . addslashes($_SESSION['user']['login_name']) . " (imported)', 
+																	'" . date('Y-m-d H:i:s') . "', 
+																	'" . addslashes($_SESSION['user']['login_name']) . " (imported)'
+																	)";
 							#echo $query . "<br /><br />";
-							
+								
 							$result = mysql_query($query);
 							$intID = mysql_insert_id();
-							
+								
 
 							if ($result && $intID)
 							{
-								
+									
 								// insert supplier account
 								$queryAccount = "INSERT INTO `mbs_suppliers_account_contacts` (`supplier_account_id`, 
 																							   `supplier_id`, 
@@ -175,7 +177,7 @@
 														VALUES (NULL , 
 																'" . $intID . "', 	
 																'" . mysql_real_escape_string($data[6]) . "', 
-																'" . mysql_real_escape_string($data[7]) . "', 
+																'" . mysql_real_escape_string(strtolower($data[7])) . "', 
 																'" . mysql_real_escape_string($data[8]) . "', 																 
 																'" . mysql_real_escape_string($data[9]) . "', 
 																'yes', 																
@@ -204,7 +206,7 @@
 														VALUES (NULL , 
 																'" . $intID . "', 	
 																'" . mysql_real_escape_string($data[10]) . "', 
-																'" . mysql_real_escape_string($data[11]) . "', 
+																'" . mysql_real_escape_string(strtolower($data[11])) . "', 
 																'" . mysql_real_escape_string($data[12]) . "', 																 
 																'" . mysql_real_escape_string($data[13]) . "', 
 																'yes', 																
@@ -236,25 +238,27 @@
 													NULL)";			
 									
 								$resultLog = mysql_query($queryLog);
-								
-																
+									
+																	
 							} // end if ($result) 
 
-					} // if ($countCheck == 0)
-					
+						} // if ($countCheck == 0)
+						
+						else
+						{
+							echo "\"" . stripslashes($data[1]) . "\" already exists. The import was terminated.<br />Please make sure the CSV file does not contain duplicated Supplier data!<br />";
+							exit;
+						}
+						
+								
+					} // end if ($row > 1)
+
 					else
 					{
-						echo "\"" . stripslashes($data[1]) . "\" already exists. The import was terminated.<br />Please make sure the CSV file does not contain duplicated Supplier data!<br />";
-						exit;
+						#echo "Error: Found no valid data on the file. Please make sure the file is containing valid data in CSV format!<br />";
 					}
-					
-							
-				} // end if ($row > 1)
 
-				else
-				{
-					#echo "Error: Found no valid data on the file. Please make sure the file is containing valid data in CSV format!<br />";
-				}
+				} // end if ($data[1]) {}	
 			    
 			} // end while()
 							

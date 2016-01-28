@@ -9,9 +9,11 @@
 <title>Activity List | <?php echo stripslashes($arrSiteConfig['site_name']); ?></title> 
 	<meta name="description" content="<?php echo stripslashes($arrSiteConfig['site_description']); ?>" /> 
 	<?php include('inc/init.php'); ?>
+	<?php if(!isset($_REQUEST['print'])):?>	
 	<style type="text/css">
 	body, #wrapper, #content-wrapper, #content, #box { background: none; }
 	</style>
+	<?php endif;?>
 </head> 
 
 <body>
@@ -32,10 +34,11 @@
 
 				<div style="text-align:center;clear:both;"><h2 style="font-size:1.2em;font-weight:bold;">Activity Price</h2></div>
 				   		
-				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#ccc">
+				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#333;">
 				  <tr>
 				  	<td><div style="width:80px;font-weight:bold;text-align:right;">No.</div></td>
 				   	<td><div style="font-weight:bold;">Name</div></td>
+				   	<td><div style="font-weight:bold;">Year</div></td>
 				   	<td><div style="font-weight:bold;">Price</div></td>
 				   	<td><div style="font-weight:bold;">Description</div></td>
 				   	<td><div style="font-weight:bold;">Store Related</div></td>				   	
@@ -44,8 +47,14 @@
 		   		<?php
 
 		   			$conn = $db->dbConnect();
+
+		   			if(isset($_REQUEST['year'])){
+						$intYear = $_REQUEST['year'];
+					}else{
+						$intYear  = date("Y");
+					}
 			
-					$query = "SELECT * FROM `mbs_activities` ORDER BY `activity_name`";
+					$query = "SELECT * FROM `mbs_activities` WHERE year = '$intYear' ORDER BY `activity_name`";
 					$result = mysql_query($query);
 					
 					if ($result) 
@@ -59,6 +68,7 @@
 				   			<tr>
 				   				<td><div style="text-align:right;"><?php echo $intNo; ?></div></td>
 				   				<td><?php echo stripslashes($row['activity_name']); ?></td>
+				   				<td><?php echo stripslashes($row['year']); ?></td>
 				   				<td><div style="text-align:right;">$<?php echo stripslashes($row['activity_price']); ?></div></td>
 				   				<td><?php echo stripslashes($row['activity_description']); ?></td>
 				   				<td><?php echo stripslashes($row['activity_store_related']); ?></td>				   				
@@ -73,11 +83,13 @@
 
 			</div>	<!-- end #box -->	
 
-			<script>
-			$(document).ready(function () { 
-				window.print();
-			});
-			</script>	
+			<?php if(!isset($_REQUEST['print'])){?>			
+				<script>
+					$(document).ready(function () {
+						window.print();
+					});
+				</script>
+            <?php } ?>
     
     	</div> <!-- end #content -->
     </div> <!-- end #content-wrapper -->   

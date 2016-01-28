@@ -9,9 +9,11 @@
 <title> Booking View | <?php echo stripslashes($arrSiteConfig['site_name']); ?></title> 
 	<meta name="description" content="<?php echo stripslashes($arrSiteConfig['site_description']); ?>" /> 
 	<?php include('inc/init.php'); ?>
+	<?php if(!isset($_REQUEST['print'])):?>	
 	<style type="text/css">
 	body, #wrapper, #content-wrapper, #content, #box { background: none; }
 	</style>
+	<?php endif;?>
 </head> 
 
 <body>
@@ -92,7 +94,7 @@
 				  </tr>
 				</table>
 
-				<table class="table table-bordered">			  		  
+				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#333;">			  		  
 					<thead class="well">
 					<tr>
 						<th style="text-align:center;"><strong>Month/Year</strong></th>
@@ -107,9 +109,13 @@
 					<?php if ($arrBookingActivityData[$i]['store_id']) { $arrStoreID = explode(',', $arrBookingActivityData[$i]['store_id']); $intStoreCount = count($arrStoreID); } ?>
 					<?php if ($arrBookingActivityData[$i]['store_id']) { $strPrice = $arrBookingActivityData[$i]['booking_activity_price']*$intStoreCount; } else { $strPrice = $arrBookingActivityData[$i]['booking_activity_price']; } ?>
 					<tr>
-					  	<td><?php echo $html->getMonthName($arrBookingActivityData[$i]['booking_activity_month']); ?> <?php echo stripslashes($arrBookingActivityData[$i]['booking_activity_year']); ?></td>
-					  	<td><?php echo stripslashes($arrBookingActivityData[$i]['booking_activity_description']); ?></td>
-					  	<td style="width:20%;"><div style="text-align:right;">$<?php echo number_format($strPrice, 2); ?></div></td>					  	
+					  	<td valign="top"><?php echo $html->getMonthName($arrBookingActivityData[$i]['booking_activity_month']); ?> <?php echo stripslashes($arrBookingActivityData[$i]['booking_activity_year']); ?></td>
+					  	<?php if(isset($_REQUEST['for_email'])):?>
+					  		<td valign="top"><?php echo preg_replace("/Normal Retail Price: ([\w\D]*)/", "", stripslashes($arrBookingActivityData[$i]['booking_activity_description'])); ?></td>
+					  	<?php else:?>
+					  		<td valign="top"><?php echo stripslashes($arrBookingActivityData[$i]['booking_activity_description']); ?></td>
+					  	<?php endif;?>
+					  	<td valign="top" style="width:20%;"><div style="text-align:right;">$<?php echo number_format($strPrice, 2); ?></div></td>					  	
 					</tr>
 					<?php $intTotalAmount += $strPrice; ?>
 					<?php } ?>	
@@ -235,11 +241,13 @@
 
 			</div>	<!-- end #box -->	
 
-			<script>
-			$(document).ready(function () {
-				window.print();
-			});
-			</script>	
+			<?php if(!isset($_REQUEST['print'])){?>			
+				<script>
+					$(document).ready(function () {
+						window.print();
+					});
+				</script>
+            <?php } ?>	
     
     	</div> <!-- end #content -->
     </div> <!-- end #content-wrapper -->   

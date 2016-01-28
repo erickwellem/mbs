@@ -250,7 +250,7 @@
 			      <!-- Store Fax -->
 			      <label class="control-label" for="frm_store_fax">Fax</label>
 			      <div class="controls">
-			        <input type="text" id="frm_store_fax" name="frm_store_fax" placeholder="Type Store fax" class="input-xlarge" value="<?php if ($_REQUEST['frm_store_fax']) { echo stripslashes($_REQUEST['frm_store_fax']); } elseif (!$_REQUEST['frm_store_fax'] && $row['store_fax']) { echo stripslashes($row['store_fax']); } ?>" data-validation="required" /> *	        
+			        <input type="text" id="frm_store_fax" name="frm_store_fax" placeholder="Type Store fax" class="input-xlarge" value="<?php if ($_REQUEST['frm_store_fax']) { echo stripslashes($_REQUEST['frm_store_fax']); } elseif (!$_REQUEST['frm_store_fax'] && $row['store_fax']) { echo stripslashes($row['store_fax']); } ?>" /> 	        
 			        <p class="help-block">The store name</p>
 			        <div id="statusbox"></div>
 			      </div>
@@ -260,7 +260,7 @@
 			      <!-- Store Email -->
 			      <label class="control-label" for="frm_store_email">Email</label>
 			      <div class="controls">
-			        <input type="text" id="frm_store_email" name="frm_store_email" placeholder="Type Store email" class="input-xlarge" value="<?php if ($_REQUEST['frm_store_email']) { echo stripslashes($_REQUEST['frm_store_email']); } elseif (!$_REQUEST['frm_store_email'] && $row['store_email']) { echo stripslashes($row['store_email']); } ?>" data-validation="required" /> *	        
+			        <input type="text" id="frm_store_email" name="frm_store_email" placeholder="Type Store email" class="input-xlarge" value="<?php if ($_REQUEST['frm_store_email']) { echo stripslashes($_REQUEST['frm_store_email']); } elseif (!$_REQUEST['frm_store_email'] && $row['store_email']) { echo stripslashes($row['store_email']); } ?>" /> 	        
 			        <p class="help-block">The store name</p>
 			        <div id="statusbox"></div>
 			      </div>
@@ -270,7 +270,7 @@
 			      <!-- Store Contact -->
 			      <label class="control-label" for="frm_store_contact">Contact</label>
 			      <div class="controls">
-			        <input type="text" id="frm_store_contact" name="frm_store_contact" placeholder="Type Store contact" class="input-xlarge" value="<?php if ($_REQUEST['frm_store_contact']) { echo stripslashes($_REQUEST['frm_store_contact']); } elseif (!$_REQUEST['frm_store_contact'] && $row['store_contact']) { echo stripslashes($row['store_contact']); } ?>" data-validation="required" /> *	        
+			        <input type="text" id="frm_store_contact" name="frm_store_contact" placeholder="Type Store contact" class="input-xlarge" value="<?php if ($_REQUEST['frm_store_contact']) { echo stripslashes($_REQUEST['frm_store_contact']); } elseif (!$_REQUEST['frm_store_contact'] && $row['store_contact']) { echo stripslashes($row['store_contact']); } ?>" /> 	        
 			        <p class="help-block">The store name</p>
 			        <div id="statusbox"></div>
 			      </div>

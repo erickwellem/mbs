@@ -7,11 +7,18 @@
  * 		
  * @Desc: Process file using Ajax
  **************************************************************************************************/
-session_start();
+/*$data = $_POST;
+
+echo "<pre>";
+print_r($data);
+echo "</pre>";
+die;*/
+
 include('../config.php');
 require_once('../lib/db.php');
 require_once('../lib/admin.php');
 require_once('../lib/html.php');
+session_start();
 
 $db = new DB();
 $admin = new ADMIN();
@@ -21,11 +28,7 @@ $html = new HTML();
 //--> Add
 if ($_REQUEST['action'] == "add" && 
 	$_REQUEST['frm_supplier_name'] && 
-	$_REQUEST['frm_supplier_email'] && 
-	$_REQUEST['frm_supplier_phone_number'] && 
-	$_REQUEST['frm_supplier_postal_address'] && 
-	$_REQUEST['frm_supplier_contact_name'] && 
-	$_REQUEST['frm_supplier_contact_name'])
+	$_REQUEST['frm_supplier_phone_number'])
 {
 	
 	// filter input
@@ -67,8 +70,7 @@ if ($_REQUEST['action'] == "add" &&
 
 	$result = mysql_query($query);
 	$intID = mysql_insert_id();
-
-
+	
 	if ($result)
 	{
 
@@ -151,6 +153,7 @@ if ($_REQUEST['action'] == "add" &&
 																				   `supplier_territory_name`, 
 																				   `supplier_territory_phone_number`, 
 																				   `supplier_territory_active`, 
+																				   `supplier_territory_store`, 
 																				   `supplier_territory_created_date`, 
 																				   `supplier_territory_created_by`, 
 																				   `supplier_territory_modified_date`, 
@@ -163,12 +166,14 @@ if ($_REQUEST['action'] == "add" &&
 																					'" . mysql_real_escape_string($_REQUEST['frm_supplier_territory_name_' . $i]) . "', 																					
 																					'" . mysql_real_escape_string($_REQUEST['frm_supplier_territory_phone_number_' . $i]) . "', 																					
 																					'yes', 
+																					'" . mysql_real_escape_string(implode(",", $_REQUEST['frm_supplier_territory_store_' . $i])) . "', 																					
 																					'" . date('Y-m-d H:i:s') . "', 
 																					'" . $_SESSION['user']['login_name'] . "',
 																					'" . date('Y-m-d H:i:s') . "', 
 																					'" . $_SESSION['user']['login_name'] . "')";
 
 				$resultTerritory = mysql_query($queryTerritory);
+				echo mysql_error();
 				
 			} // for ($i = 1; $i <= 6; $i++)
 		} // if ($intID && ($_REQUEST['frm_supplier_territory_name_1'] || ...
@@ -367,6 +372,7 @@ elseif ($_REQUEST['action'] == "edit" && $_REQUEST['supplier_id'])
 																					 `supplier_territory_name` = '" . mysql_real_escape_string($_REQUEST['frm_supplier_territory_name_' . $i]) . "', 
 																					 `supplier_territory_phone_number` = '" . mysql_real_escape_string($_REQUEST['frm_supplier_territory_phone_number_' . $i]) . "', 
 																					 `supplier_territory_active` = 'yes', 
+																					 `supplier_territory_store` = '" . mysql_real_escape_string(implode(",", $_REQUEST['frm_supplier_territory_store_' . $i])) . "', 
 																					 `supplier_territory_modified_date` = '" . date('Y-m-d H:i:s') . "', 
 																					 `supplier_territory_modified_by` =  '" . $_SESSION['user']['login_name'] . "' 
 
@@ -397,6 +403,7 @@ elseif ($_REQUEST['action'] == "edit" && $_REQUEST['supplier_id'])
 																						'" . mysql_real_escape_string($_REQUEST['frm_supplier_territory_name_' . $i]) . "', 																					
 																						'" . mysql_real_escape_string($_REQUEST['frm_supplier_territory_phone_number_' . $i]) . "', 																					
 																						'yes', 
+																						'" . mysql_real_escape_string(implode(",", $_REQUEST['frm_supplier_territory_store_' . $i])) . "', 																					
 																						'" . date('Y-m-d H:i:s') . "', 
 																						'" . $_SESSION['user']['login_name'] . "',
 																						'" . date('Y-m-d H:i:s') . "', 

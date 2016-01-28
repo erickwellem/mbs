@@ -32,7 +32,7 @@
 
 				<div style="text-align:center;clear:both;"><h2 style="font-size:1.2em;font-weight:bold;">Stores</h2></div>
 				   		
-				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#ccc">
+				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#333;">
 				  <tr>
 				  	<td><div style="width:80px;font-weight:bold;text-align:right;">No.</div></td>
 				   	<td><div style="font-weight:bold;">Name</div></td>

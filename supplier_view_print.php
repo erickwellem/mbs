@@ -89,7 +89,7 @@
 
 		   		<h2 style="font-size:1.2em;font-weight:bold;">Suppliers &raquo; <?php echo stripslashes($row['supplier_name']); ?></h2>
 		   		
-		   		<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#ccc">
+		   		<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#333;">
 		   			<tr>
 		   				<td colspan="2"><div style="font-weight:bold;">Data</div></td>
 		   			</tr>		   			

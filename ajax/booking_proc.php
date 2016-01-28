@@ -7,11 +7,11 @@
  * 		
  * @Desc: Process file using Ajax
  **************************************************************************************************/
-session_start();
 include('../config.php');
 require_once('../lib/db.php');
 require_once('../lib/admin.php');
 require_once('../lib/html.php');
+session_start();
 
 $db = new DB();
 $admin = new ADMIN();
@@ -72,9 +72,13 @@ function insertBooking()
 
 function insertBookingActivity($intBookingID)
 {
-	global $db, $strSizeID, $strStoreID, $strActivityDescription, $strActivityPrice, $strActivityPriceTotal;
+	global $db,  $strStoreID, $strActivityDescription, $strActivityPrice, $strActivityPriceTotal;
 
 	$db->dbConnect();
+
+	$strSizeID;
+
+	if ($_REQUEST['frm_size_id'] == '0' || $_REQUEST['frm_size_id'] == '') { $strSizeID = "NULL"; } else { $strSizeID = "'" . mysql_real_escape_string($_REQUEST['frm_size_id']) . "'"; }
 
 	$query = "INSERT INTO `mbs_bookings_activities` (`booking_activity_id`, 
 													`booking_id`, 
@@ -110,7 +114,7 @@ function insertBookingActivity($intBookingID)
 
 	$result = mysql_query($query);
 	$intID = mysql_insert_id();
-	#echo $query ."<br /><br />";	
+	//echo $query ."<br /><br />";	
 	return $intID;	
 	
 } // insertBookingActivity()
@@ -124,12 +128,14 @@ function insertBookingProduct($intBookingID, $intBookingActivityID)
 
 	$query = "INSERT INTO `mbs_bookings_products` (`booking_product_id`, 
 												  `booking_id`, 
-												  `booking_activity_id`, 
+												  `booking_activity_id`,
+												  `booking_department_id`, 
 												  `booking_product_code`, 
 												  `booking_product_name`, 																	
 												  `booking_product_normal_retail_price`, 
 												  `booking_product_promo_price`, 
 												  `booking_product_cost_price`, 
+												  `booking_product_discount`, 
 												  `booking_product_recommended_retail_price`, 
 												  `booking_product_special_offer_details`, 
 												  `booking_product_description`, 
@@ -141,11 +147,13 @@ function insertBookingProduct($intBookingID, $intBookingActivityID)
 										   VALUES (NULL, 
 										   		   '" . $intBookingID . "', 
 										   		   '" . $intBookingActivityID . "', 
+										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_department_id']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_code']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_name']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_normal_retail_price']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_promo_price']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_cost_price']) . "', 
+										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_discount']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_recommended_retail_price']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_special_offer_details']) . "', 
 										   		   '" . mysql_real_escape_string($_REQUEST['frm_booking_product_code'] . " " . $_REQUEST['frm_booking_product_name']) . "',
@@ -195,9 +203,13 @@ function updateBooking($intBookingID)
 
 function updateBookingActivity($intBookingActivityID)
 {
-	global $db, $strSizeID, $strStoreID, $strActivityDescription, $strActivityPrice, $strActivityPriceTotal;
+	global $db,  $strStoreID, $strActivityDescription, $strActivityPrice, $strActivityPriceTotal;
 
 	$db->dbConnect();
+
+	$strSizeID;
+	
+	if ($_REQUEST['frm_size_id'] == '0' || $_REQUEST['frm_size_id'] == '') { $strSizeID = "NULL"; } else { $strSizeID = "'" . mysql_real_escape_string($_REQUEST['frm_size_id']) . "'"; }
 
 	$query = "UPDATE `mbs_bookings_activities` SET `activity_id` = '" . mysql_real_escape_string($_REQUEST['frm_activity_id']) . "', 
 												  `size_id` = " . $strSizeID . ", 
@@ -230,11 +242,14 @@ function updateBookingProduct($intBookingProductID)
 
 	$db->dbConnect();
 
-	$query = "UPDATE `mbs_bookings_products` SET `booking_product_code` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_code']) . "', 
+	$query = "UPDATE `mbs_bookings_products` SET 
+												`booking_department_id` = '" . mysql_real_escape_string($_REQUEST['frm_booking_department_id']) . "', 
+												`booking_product_code` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_code']) . "', 
 												`booking_product_name` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_name']) . "', 
 												`booking_product_normal_retail_price` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_normal_retail_price']) . "', 
 												`booking_product_promo_price` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_promo_price']) . "', 
 												`booking_product_cost_price` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_cost_price']) . "', 
+												`booking_product_discount` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_discount']) . "', 
 												`booking_product_recommended_retail_price` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_recommended_retail_price']) . "', 
 												`booking_product_special_offer_details` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_special_offer_details']) . "', 
 												`booking_product_description` = '" . mysql_real_escape_string($_REQUEST['frm_booking_product_code'] . " " . $_REQUEST['frm_booking_product_name']) . "', 
@@ -335,10 +350,122 @@ function updateBookingActivityDescription($intBookingActivityID)
 
 	$db->dbConnect();
 
-	$strBookingActivityDesc = $db->dbIDToField('mbs_bookings_activities', 'booking_activity_id', $intBookingActivityID, 'booking_activity_description');
-	$strBookingActivityDesc .= $strProductResult;
+	#$strBookingActivityDesc = $db->dbIDToField('mbs_bookings_activities', 'booking_activity_id', $intBookingActivityID, 'booking_activity_description');
+	// get booking activity 
+	$query = "SELECT * FROM `mbs_bookings_activities` WHERE `booking_activity_id` = '" . $intBookingActivityID . "' LIMIT 1";
+	$result = mysql_query($query);
 
-	$query = "UPDATE `mbs_bookings_activities` SET `booking_activity_description` = '" . $strBookingActivityDesc . "' WHERE `booking_activity_id` = '" . $intBookingActivityID . "' LIMIT 1";
+	$strActivityDescription = "";
+
+	if ($result)
+	{
+		$row = mysql_fetch_assoc($result);
+
+		$strActivityName = DB::dbIDToField('mbs_activities', 'activity_id', $row['activity_id'], 'activity_name');
+		
+		$strActivityDescription .= "<strong>" . $strActivityName . "</strong>";
+		$strActivityPrice = floatval($row['booking_activity_price']);
+
+		if ($strActivityPrice) { $strActivityDescription .= " @ $" . number_format($strActivityPrice, 2) . " "; }
+
+
+		//-- filter the store id, make sure the input is clean n,n,n format
+		if ($row['store_id'])
+		{
+			$arrStoreID = explode(',', $row['store_id']);
+				
+			if (is_array($arrStoreID) && count($arrStoreID) > 0) 
+			{
+				$strStoreID = "";	
+				for ($i = 0; $i < count($arrStoreID); $i++)
+				{
+					if ($arrStoreID[$i] && (strlen($arrStoreID[$i]) > 0) && $arrStoreID[$i] !== '0' && $arrStoreID[$i] !== 'undefined')
+					{
+						$strStoreID .= $arrStoreID[$i];
+
+						if ($i == count($arrStoreID)-1) { $strStoreID .= ""; } else { $strStoreID .= ","; }
+					}
+				}
+
+				if (substr($strStoreID, -1) == ",") { $strStoreID = substr_replace($strStoreID, '', -1); }
+			}
+
+			//-- set activity description related to store ID's
+			if ($strStoreID) 
+			{ 
+				$strStoreIDConv = explode(',', $strStoreID); 
+
+				$strStoreResult = "";
+				if (count($strStoreIDConv) > 0)
+				{
+					$strStoreResult .= " for ";  
+					if (count($strStoreIDConv) > 1) { $strStoreResult .= count($strStoreIDConv) . " stores: "; } else { $strStoreResult .= " store: "; }
+					for ($i = 0; $i < count($strStoreIDConv); $i++)
+					{
+						$strStoreResult .= $db->dbIDToField('mbs_stores', 'store_id', $strStoreIDConv[$i], 'store_name');
+						
+						if ($i == (count($strStoreIDConv)-2)) { $strStoreResult.= " and "; } elseif ($i == (count($strStoreIDConv)-1)) { $strStoreResult.= ""; } else { $strStoreResult.= ", "; }
+					}
+				}
+				
+			}
+
+			//-- Activity description for Store results
+			if ($strStoreResult) { $strActivityDescription .= $strStoreResult . ". "; }
+		
+		} // if ($row['store_id'])
+
+
+		$queryProduct = "SELECT * FROM `mbs_bookings_products` AS product INNER JOIN `mbs_departments` as department ON product.booking_department_id = department.department_id WHERE `booking_activity_id` = '" . $row['booking_activity_id'] . "' ORDER BY `booking_product_name`, `booking_product_id`";
+		$resultProduct = mysql_query($queryProduct);
+		
+
+		$strProductResult = "";
+		
+		if(strpos($strActivityName, "Gondola End") !== false && strpos($strActivityName, "Supplier Merchandised") !== false){
+			
+			$intSupplierId = DB::dbIDToField('mbs_bookings', 'booking_id', $row['booking_id'], 'supplier_id');
+			
+			$strProductResult .= "<br><br /><em><u>Supplier Contact</u></em>";
+			$rowSupplierAccount = DB::getSupplierAccount($intSupplierId);
+			$strProductResult .= "<br>Name : ".$rowSupplierAccount['supplier_contact_name'];
+			$strProductResult .= "<br>Phone : ".$rowSupplierAccount['supplier_contact_phone_number'];
+			$strProductResult .= "<br>Email : ".$rowSupplierAccount['supplier_contact_email']."<br>";
+		}
+		
+		if ($resultProduct)
+		{
+
+			while ($rowProduct = mysql_fetch_assoc($resultProduct))
+			{
+				//-- Set activity description related to product
+				
+				if ($rowProduct['booking_product_code'] || $_REQUEST['booking_product_name'])
+				{
+					$strProductResult .= "<br /><br />\n\n<em><u>Product Detail:</u></em>";
+					if ($rowProduct['booking_product_code']) { $strProductResult .= "<br />\nUPI Code: " . $rowProduct['booking_product_code'] . ", "; }		
+					if ($rowProduct['booking_product_name']) { $strProductResult .= "<br />\nName: " . $rowProduct['booking_product_name'] . ", "; }
+					if ($rowProduct['booking_department_id']) { $strProductResult .= "<br />\nDepartment: " . $rowProduct['department_name'] . ", "; }
+					if ($rowProduct['booking_product_normal_retail_price']) { $strProductResult .= "<br />\nNormal Retail Price: $" . $rowProduct['booking_product_normal_retail_price'] . ", "; }
+					if ($rowProduct['booking_product_promo_price']) { $strProductResult .= "<br />\nPromo Price: $" . $rowProduct['booking_product_promo_price'] . ", "; }
+					if ($rowProduct['booking_product_cost_price']) { $strProductResult .= "<br />\nCost Price: $" . $rowProduct['booking_product_cost_price'] . ", "; }
+					if ($rowProduct['booking_product_recommended_retail_price']) { $strProductResult .= "<br />\nRRP: $" . $rowProduct['booking_product_recommended_retail_price'] . ", "; }
+					if ($rowProduct['booking_product_discount']) { $strProductResult .= "<br />\nDiscount: " . $rowProduct['booking_product_discount'] . " % , "; }
+					if ($rowProduct['booking_product_special_offer_details']) { $strProductResult .= "<br />\nSpecial Offer: " . $rowProduct['booking_product_special_offer_details'] . ""; }
+				}
+				
+
+			} // while ($rowProduct = mysql_fetch_assoc($resultProduct))
+
+			
+		} // if ($resultProduct)	
+
+	} // if ($result)
+
+	//-- Activity description for Product results
+	if ($strProductResult) { $strActivityDescription .= $strProductResult; }
+
+	$query = "UPDATE `mbs_bookings_activities` SET `booking_activity_description` = '" . $strActivityDescription . "' WHERE `booking_activity_id` = '" . $intBookingActivityID . "' LIMIT 1";
 	$result = mysql_query($query);	
 
 	if ($result)
@@ -406,10 +533,11 @@ function showAlert($strAlertContent, $intBookingID, $intBookingActivityID, $intB
 	}
 
 	if (!$_REQUEST['frm_booking_active']) { $_REQUEST['frm_booking_active'] = "yes"; }
-	if ($_REQUEST['frm_size_id'] == '0' || $_REQUEST['frm_size_id'] == '') { $strSizeID = "NULL"; } else { $strSizeID = "'" . mysql_real_escape_string($_REQUEST['frm_size_id']) . "'"; }
+	//if ($_REQUEST['frm_size_id'] == '0' || $_REQUEST['frm_size_id'] == '') { $strSizeID = "NULL"; } else { $strSizeID = "'" . mysql_real_escape_string($_REQUEST['frm_size_id']) . "'"; }
 	$strSupplierName = $db->dbIDToField('mbs_suppliers', 'supplier_id', $_REQUEST['frm_supplier_id'], 'supplier_name');
 
-	// get activity description/name
+
+	//-- get activity description/name #####################
 	$strActivityDescription = "<strong>" . DB::dbIDToField('mbs_activities', 'activity_id', $_REQUEST['frm_activity_id'], 'activity_name') . "</strong>";
 	$strActivityPrice = floatval($_REQUEST['frm_booking_activity_price']);
 	
@@ -488,7 +616,7 @@ function showAlert($strAlertContent, $intBookingID, $intBookingActivityID, $intB
 
 	//-- Activity description for Product results
 	if ($strProductResult) { $strActivityDescription .= $strProductResult; }
-
+	// #####################
 
 	//-- Product Name / Code
 	$strBookingProduct = stripslashes($_REQUEST['frm_booking_product_name']) . " (" . $_REQUEST['frm_booking_product_code'] . ")";
@@ -716,7 +844,7 @@ if (verifyInput() > 0)
 			$strMessage .= "<p><em>\"" . stripslashes(htmlspecialchars($_REQUEST['frm_message'])) . "\"</em></p><br />\n\n";
 		}
 
-		$strMessage .= file_get_contents($STR_URL . 'booking_view_print.php?action=print&booking_id=' . $_REQUEST['booking_id']);
+		$strMessage .= file_get_contents($STR_URL . 'booking_view_print.php?action=print&for_email=yes&booking_id=' . $_REQUEST['booking_id']);
 		
 
 		// From

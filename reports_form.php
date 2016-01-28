@@ -296,7 +296,7 @@
 							      		<option value="all">All Years</option>							      		
 							      		<?php for ($i = intval(date('Y')-5); $i <= intval(date('Y') + 5); $i++) { ?>
 							      		<option value="<?php echo $i; ?>"<?php if ($_REQUEST['availability_by_year'] && $_REQUEST['availability_by_year'] == $i) { echo " selected=\"selected\""; } ?>><?php echo $i; ?></option>
-							      		<? } ?>
+							      		<?php } ?>
 							      	</select>  							        
 							      </div>
 							    </div>  

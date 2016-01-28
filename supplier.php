@@ -108,6 +108,11 @@
 	
     <meta name="description" content="<?php echo stripslashes($arrSiteConfig['site_description']); ?>" /> 
 	<?php include('inc/init.php'); ?>
+    
+    <!-- Select2 jQuery Plugin -->
+    <link href="<?php echo $STR_URL; ?>css/select2-3.4.3/select2.css" rel="stylesheet"/>
+    <script src="<?php echo $STR_URL; ?>css/select2-3.4.3/select2.js"></script>
+    <!-- Select2 jQuery Plugin -->
 
 	
 	<?php if ($_REQUEST['action'] == "add") { ?>
@@ -260,9 +265,8 @@
 						<li id="fourth-tab"><a href="#tab4" data-toggle="tab" class="btn-popover" rel="popover" data-content="This tab is for the Supplier's Territory Contacts data. Please fill all required fields (*)" data-original-title="4. Territory Contacts Tab"><i class="icon-align-justify"></i> Territory Contacts</a></li>
 						<li id="fifth-tab"><a href="#tab5" data-toggle="tab" class="btn-popover" rel="popover" data-content="This tab is for the Supplier's booking related data. Please fill all required fields (*)" data-original-title="5. Supplier Misc. info Tab"><i class="icon-align-justify"></i> Miscellaneous</a></li>
 					</ul>
-
-
-					<div class="tab-content">	
+                    
+                    <div class="tab-content">	
 
 						<div class="tab-pane active" id="tab1">
 
@@ -289,7 +293,7 @@
 										    <!-- Supplier Postal Address -->
 										    <label class="control-label" for="frm_supplier_postal_address">Postal Address</label>
 										    <div class="controls">
-										    	<textarea name="frm_supplier_postal_address" id="frm_supplier_postal_address" placeholder="Type Supplier postal address" class="input-xlarge" rows="3" data-validation="required"><?php if ($_REQUEST['frm_supplier_postal_address']) { echo stripslashes($_REQUEST['frm_supplier_postal_address']); } elseif (!$_REQUEST['frm_supplier_postal_address'] && $row['supplier_postal_address']) { echo stripslashes($row['supplier_postal_address']); } ?></textarea> *
+										    	<textarea name="frm_supplier_postal_address" id="frm_supplier_postal_address" placeholder="Type Supplier postal address" class="input-xlarge" rows="3"><?php if ($_REQUEST['frm_supplier_postal_address']) { echo stripslashes($_REQUEST['frm_supplier_postal_address']); } elseif (!$_REQUEST['frm_supplier_postal_address'] && $row['supplier_postal_address']) { echo stripslashes($row['supplier_postal_address']); } ?></textarea>
 										        <p class="help-block"></p>
 										    </div>
 										</div>
@@ -307,7 +311,7 @@
 										    <!-- Supplier Contact Email -->
 										    <label class="control-label" for="frm_supplier_email">Contact Email</label>
 										    <div class="controls">
-										        <input type="text" id="frm_supplier_email" name="frm_supplier_email" placeholder="Type Supplier contact email" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_email']) { echo stripslashes($_REQUEST['frm_supplier_email']); } elseif (!$_REQUEST['frm_supplier_email'] && $row['supplier_email']) { echo stripslashes($row['supplier_email']); } ?>" data-validation="validate_email" /> *	        
+										        <input type="text" id="frm_supplier_email" name="frm_supplier_email" placeholder="Type Supplier contact email" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_email']) { echo stripslashes($_REQUEST['frm_supplier_email']); } elseif (!$_REQUEST['frm_supplier_email'] && $row['supplier_email']) { echo stripslashes($row['supplier_email']); } ?>" />	        
 										        <p class="help-block"></p>				        
 										    </div>
 										</div>
@@ -317,7 +321,7 @@
 									      <label class="control-label" for="frm_supplier_po_ref_number">Ref No required?</label>
 									      <div class="controls">
 									      	<input type="checkbox" name="frm_supplier_po_ref_number_required" id="frm_supplier_po_ref_number_required" value="yes"<?php if ($_REQUEST['frm_supplier_po_ref_number_required'] || $row['supplier_po_ref_number']) { ?>checked="checked"<?php } ?> /> 
-									        <input type="text" id="frm_supplier_po_ref_number" name="frm_supplier_po_ref_number" placeholder="Type Supplier's Ref. No" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_po_ref_number']) { echo stripslashes($_REQUEST['frm_supplier_po_ref_number']); } elseif (!$_REQUEST['frm_supplier_po_ref_number'] && $row['supplier_po_ref_number']) { echo stripslashes($row['supplier_po_ref_number']); } ?>" data-validation="" /> 
+									        <input type="text" id="frm_supplier_po_ref_number" name="frm_supplier_po_ref_number" placeholder="Type Supplier's Ref. No" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_po_ref_number']) { echo stripslashes($_REQUEST['frm_supplier_po_ref_number']); } elseif (!$_REQUEST['frm_supplier_po_ref_number'] && $row['supplier_po_ref_number']) { echo stripslashes($row['supplier_po_ref_number']); } ?>" /> 
 									        <p class="help-block">Please check and type in the supplier's reference number for purchase order if required</p>
 									      </div>
 									    </div>
@@ -373,7 +377,7 @@
 								      <!-- Supplier Contact Position -->
 								      <label class="control-label" for="frm_supplier_contact_position">Title/Position</label>
 								      <div class="controls">
-								        <input type="text" id="frm_supplier_contact_position" name="frm_supplier_contact_position" placeholder="Type Supplier marketing contact title or position" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_contact_position']) { echo stripslashes($_REQUEST['frm_supplier_contact_position']); } elseif (!$_REQUEST['frm_supplier_contact_position'] && $arrContacts[0]['supplier_contact_position']) { echo stripslashes($arrContacts[0]['supplier_contact_position']); } ?>" data-validation="required" /> *
+								        <input type="text" id="frm_supplier_contact_position" name="frm_supplier_contact_position" placeholder="Type Supplier marketing contact title or position" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_contact_position']) { echo stripslashes($_REQUEST['frm_supplier_contact_position']); } elseif (!$_REQUEST['frm_supplier_contact_position'] && $arrContacts[0]['supplier_contact_position']) { echo stripslashes($arrContacts[0]['supplier_contact_position']); } ?>" /> 
 								        <p class="help-block">The supplier marketing contact title or position</p>				        
 								      </div>
 								    </div>
@@ -382,7 +386,7 @@
 								      <!-- Supplier Contact Postal Address -->
 								      <label class="control-label" for="frm_supplier_contact_postal_address">Postal Address (Billing Address)</label>
 								      <div class="controls">
-								        <textarea name="frm_supplier_contact_postal_address" id="frm_supplier_contact_postal_address" placeholder="Type Supplier marketing contact postal address" class="input-xlarge" rows="3" data-validation="required"><?php if ($_REQUEST['frm_supplier_contact_postal_address']) { echo stripslashes($_REQUEST['frm_supplier_contact_postal_address']); } elseif (!$_REQUEST['frm_supplier_contact_postal_address'] && $arrContacts[0]['supplier_contact_postal_address']) { echo stripslashes($arrContacts[0]['supplier_contact_postal_address']); } ?></textarea> *
+								        <textarea name="frm_supplier_contact_postal_address" id="frm_supplier_contact_postal_address" placeholder="Type Supplier marketing contact postal address" class="input-xlarge rep-address" rows="3"><?php if ($_REQUEST['frm_supplier_contact_postal_address']) { echo stripslashes($_REQUEST['frm_supplier_contact_postal_address']); } elseif (!$_REQUEST['frm_supplier_contact_postal_address'] && $arrContacts[0]['supplier_contact_postal_address']) { echo stripslashes($arrContacts[0]['supplier_contact_postal_address']); } ?></textarea>
 								        <p class="help-block">The supplier marketing contact postal address. This will be the Billing Address at the Booking document</p>
 								      </div>
 								    </div>
@@ -391,7 +395,7 @@
 								      <!-- Supplier Contact Number -->
 								      <label class="control-label" for="frm_supplier_contact_phone_number">Contact Number</label>
 								      <div class="controls">
-								        <input type="text" id="frm_supplier_contact_phone_number" name="frm_supplier_contact_phone_number" placeholder="Type Supplier marketing contact number" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_contact_phone_number']) { echo stripslashes($_REQUEST['frm_supplier_contact_phone_number']); } elseif (!$_REQUEST['frm_supplier_contact_phone_number'] && $arrContacts[0]['supplier_contact_phone_number']) { echo stripslashes($arrContacts[0]['supplier_contact_phone_number']); } ?>" data-validation="required" /> *
+								        <input type="text" id="frm_supplier_contact_phone_number" name="frm_supplier_contact_phone_number" placeholder="Type Supplier marketing contact number" class="input-xlarge rep-phone" value="<?php if ($_REQUEST['frm_supplier_contact_phone_number']) { echo stripslashes($_REQUEST['frm_supplier_contact_phone_number']); } elseif (!$_REQUEST['frm_supplier_contact_phone_number'] && $arrContacts[0]['supplier_contact_phone_number']) { echo stripslashes($arrContacts[0]['supplier_contact_phone_number']); } ?>" data-validation="required" /> *
 								        <p class="help-block">The supplier marketing contact number</p>				        
 								      </div>
 								    </div>
@@ -400,7 +404,7 @@
 								      <!-- Supplier Contact Mobile -->
 								      <label class="control-label" for="frm_supplier_contact_mobile_number">Mobile Number</label>
 								      <div class="controls">
-								        <input type="text" id="frm_supplier_contact_mobile_number" name="frm_supplier_contact_mobile_number" placeholder="Type Supplier marketing contact mobile number" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_contact_mobile_number']) { echo stripslashes($_REQUEST['frm_supplier_contact_mobile_number']); } elseif (!$_REQUEST['frm_supplier_contact_mobile_number'] && $arrContacts[0]['supplier_contact_mobile_number']) { echo stripslashes($arrContacts[0]['supplier_contact_mobile_number']); } ?>" data-validation="required" /> *
+								        <input type="text" id="frm_supplier_contact_mobile_number" name="frm_supplier_contact_mobile_number" placeholder="Type Supplier marketing contact mobile number" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_contact_mobile_number']) { echo stripslashes($_REQUEST['frm_supplier_contact_mobile_number']); } elseif (!$_REQUEST['frm_supplier_contact_mobile_number'] && $arrContacts[0]['supplier_contact_mobile_number']) { echo stripslashes($arrContacts[0]['supplier_contact_mobile_number']); } ?>"/>
 								        <p class="help-block">The supplier marketing contact mobile number</p>				        
 								      </div>
 								    </div>
@@ -409,7 +413,7 @@
 								      <!-- Supplier Contact Email -->
 								      <label class="control-label" for="frm_supplier_contact_email">Contact Email</label>
 								      <div class="controls">
-								        <input type="text" id="frm_supplier_contact_email" name="frm_supplier_contact_email" placeholder="Type Supplier marketing contact email" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_contact_email']) { echo stripslashes($_REQUEST['frm_supplier_contact_email']); } elseif (!$_REQUEST['frm_supplier_contact_email'] && $arrContacts[0]['supplier_contact_email']) { echo stripslashes($arrContacts[0]['supplier_contact_email']); } ?>" data-validation="validate_email" />  *
+								        <input type="text" id="frm_supplier_contact_email" name="frm_supplier_contact_email" placeholder="Type Supplier marketing contact email" class="input-xlarge rep-email" value="<?php if ($_REQUEST['frm_supplier_contact_email']) { echo stripslashes($_REQUEST['frm_supplier_contact_email']); } elseif (!$_REQUEST['frm_supplier_contact_email'] && $arrContacts[0]['supplier_contact_email']) { echo stripslashes($arrContacts[0]['supplier_contact_email']); } ?>" data-validation="validate_email" />  *
 								        <p class="help-block">The supplier marketing contact email</p>				       
 								      </div>
 								    </div>
@@ -455,7 +459,7 @@
 								      <!-- Supplier Contact Postal Address -->
 								      <label class="control-label" for="frm_supplier_account_postal_address">Postal Address</label>
 								      <div class="controls">
-								        <textarea name="frm_supplier_account_postal_address" id="frm_supplier_account_postal_address" placeholder="Type Supplier account contact postal address" class="input-xlarge" rows="3" data-validation=""><?php if ($_REQUEST['frm_supplier_account_postal_address']) { echo stripslashes($_REQUEST['frm_supplier_account_postal_address']); } elseif (!$_REQUEST['frm_supplier_account_postal_address'] && $arrAccounts[0]['supplier_account_postal_address']) { echo stripslashes($arrAccounts[0]['supplier_account_postal_address']); } ?></textarea> 
+								        <textarea name="frm_supplier_account_postal_address" id="frm_supplier_account_postal_address" placeholder="Type Supplier account contact postal address" class="input-xlarge rep-address" rows="3" data-validation=""><?php if ($_REQUEST['frm_supplier_account_postal_address']) { echo stripslashes($_REQUEST['frm_supplier_account_postal_address']); } elseif (!$_REQUEST['frm_supplier_account_postal_address'] && $arrAccounts[0]['supplier_account_postal_address']) { echo stripslashes($arrAccounts[0]['supplier_account_postal_address']); } ?></textarea> 
 								        <p class="help-block">The supplier account contact postal address</p>
 								      </div>
 								    </div>
@@ -464,7 +468,7 @@
 								      <!-- Supplier Contact Number -->
 								      <label class="control-label" for="frm_supplier_account_phone_number">Contact Number</label>
 								      <div class="controls">
-								        <input type="text" id="frm_supplier_account_phone_number" name="frm_supplier_account_phone_number" placeholder="Type Supplier account contact number" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_account_phone_number']) { echo stripslashes($_REQUEST['frm_supplier_account_phone_number']); } elseif (!$_REQUEST['frm_supplier_account_phone_number'] && $arrAccounts[0]['supplier_account_phone_number']) { echo stripslashes($arrAccounts[0]['supplier_account_phone_number']); } ?>" data-validation="" /> 
+								        <input type="text" id="frm_supplier_account_phone_number" name="frm_supplier_account_phone_number" placeholder="Type Supplier account contact number" class="input-xlarge rep-phone" value="<?php if ($_REQUEST['frm_supplier_account_phone_number']) { echo stripslashes($_REQUEST['frm_supplier_account_phone_number']); } elseif (!$_REQUEST['frm_supplier_account_phone_number'] && $arrAccounts[0]['supplier_account_phone_number']) { echo stripslashes($arrAccounts[0]['supplier_account_phone_number']); } ?>" data-validation="" /> 
 								        <p class="help-block">The supplier account contact number</p>				        
 								      </div>
 								    </div>
@@ -473,7 +477,7 @@
 								      <!-- Supplier Contact Email -->
 								      <label class="control-label" for="frm_supplier_account_email">Contact Email</label>
 								      <div class="controls">
-								        <input type="text" id="frm_supplier_account_email" name="frm_supplier_account_email" placeholder="Type Supplier account contact email" class="input-xlarge" value="<?php if ($_REQUEST['frm_supplier_account_email']) { echo stripslashes($_REQUEST['frm_supplier_account_email']); } elseif (!$_REQUEST['frm_supplier_account_email'] && $arrAccounts[0]['supplier_account_email']) { echo stripslashes($arrAccounts[0]['supplier_account_email']); } ?>" data-validation="" /> 
+								        <input type="text" id="frm_supplier_account_email" name="frm_supplier_account_email" placeholder="Type Supplier account contact email" class="input-xlarge rep-email" value="<?php if ($_REQUEST['frm_supplier_account_email']) { echo stripslashes($_REQUEST['frm_supplier_account_email']); } elseif (!$_REQUEST['frm_supplier_account_email'] && $arrAccounts[0]['supplier_account_email']) { echo stripslashes($arrAccounts[0]['supplier_account_email']); } ?>" data-validation="" /> 
 								        <p class="help-block">The supplier account contact email</p>				        
 								      </div>
 								    </div>
@@ -508,7 +512,7 @@
 						      	
 					  		<div class="row-fluid">
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Area 1 -->
 						        	<label for="frm_territory_id_1">Area</label>
 						        	<!--
@@ -541,26 +545,54 @@
 						        	<p class="help-block">The supplier territory area</p>				        
 					      		</div>
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Name 1 -->
 						      		<label for="frm_supplier_territory_name_1">Territory Contact 1</label>
 						        	<input type="text" id="frm_supplier_territory_name_1" name="frm_supplier_territory_name_1" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_name_1']) { echo stripslashes($_REQUEST['frm_supplier_territory_name_1']); } elseif (!$_REQUEST['frm_supplier_territory_name_1'] && $arrTerritory[0]['supplier_territory_name']) { echo stripslashes($arrTerritory[0]['supplier_territory_name']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact name</p>				        
 						      	</div>				      	
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Number 1 -->
 						      		<label for="frm_supplier_territory_phone_number_1">Contact Number</label>
 						        	<input type="text" id="frm_supplier_territory_phone_number_1" name="frm_supplier_territory_phone_number_1" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_phone_number_1']) { echo stripslashes($_REQUEST['frm_supplier_territory_phone_number_1']); } elseif (!$_REQUEST['frm_supplier_territory_phone_number_1'] && $arrTerritory[0]['supplier_territory_phone_number']) { echo stripslashes($arrTerritory[0]['supplier_territory_phone_number']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact number</p>				        
 					      		</div>
+                                
+                                <div class="span3">
+                                	<label for="frm_supplier_territory_store">Store</label>
+						        	<select name="frm_supplier_territory_store_1[]" multiple style="width:80%"  id="frm_supplier_territory_store_1" data-validation="">
+										<?php $arrStores = $db->getStoreData(); ?>								
+                                        <?php
+                                            
+                                            if (is_array($arrStores) && count($arrStores) > 0)
+                                            {
+                                                
+                                                foreach ($arrStores as $intStoreID=>$arrStoresData)
+                                                {
+                                                    echo '<option value="'.$intStoreID.'">'.$arrStoresData['store_name'].'</option>';
+                                                }
+                                                
+                                            }
+                                        ?>
+                                    </select>
+                                    <!--<input type="text" name="frm_supplier_territory_store_1" class="input-medium" id="frm_supplier_territory_store_1">-->
+                                    <script>
+										$(function(){
+											$("#frm_supplier_territory_store_1").select2();
+											<?php if(isset($arrTerritory[0]['supplier_territory_store'])):?>
+												$("#frm_supplier_territory_store_1").select2('val',[<?php echo $arrTerritory[0]['supplier_territory_store'];?>]);
+											<?php endif;?>
+										});
+									</script>
+                                </div>
 
 					      		<input type="hidden" name="frm_supplier_territory_id_1" id="frm_supplier_territory_id_1" value="<?php if ($_REQUEST['frm_supplier_territory_id_1']) { echo stripslashes($_REQUEST['frm_supplier_territory_id_1']); } elseif (!$_REQUEST['frm_supplier_territory_id_1'] && $arrTerritory[0]['supplier_territory_id']) { echo stripslashes($arrTerritory[0]['supplier_territory_id']); } ?>" />
 
 					      	</div>
 
 					      	<div class="row-fluid" style="margin-top:20px;">
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Area 2 -->
 						        	<label for="frm_territory_id_2">Area</label>
 						        	<!--<?php $arrTerritory2 = $db->getTerritoryData(); ?>
@@ -592,19 +624,46 @@
 						        	<p class="help-block">The supplier territory area</p>				        
 					      		</div>
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Name 2 -->
 						      		<label for="frm_supplier_territory_name_2">Territory Contact 2</label>
 						        	<input type="text" id="frm_supplier_territory_name_2" name="frm_supplier_territory_name_2" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_name_2']) { echo stripslashes($_REQUEST['frm_supplier_territory_name_2']); } elseif (!$_REQUEST['frm_supplier_territory_name_2'] && $arrTerritory[1]['supplier_territory_name']) { echo stripslashes($arrTerritory[1]['supplier_territory_name']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact name</p>				        
 						      	</div>				      	
 
-						      	<div class="span4">
+						      	<div class="span3">
 						        	<!-- Supplier Territory Contact Number 2 -->
 						      		<label for="frm_supplier_territory_phone_number_2">Contact Number</label>
 						        	<input type="text" id="frm_supplier_territory_phone_number_2" name="frm_supplier_territory_phone_number_2" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_phone_number_2']) { echo stripslashes($_REQUEST['frm_supplier_territory_phone_number_2']); } elseif (!$_REQUEST['frm_supplier_territory_phone_number_2'] && $arrTerritory[1]['supplier_territory_phone_number']) { echo stripslashes($arrTerritory[1]['supplier_territory_phone_number']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact number</p>				        
-					      		</div>	
+					      		</div>
+                                
+                                <div class="span3">
+                                	<label for="frm_supplier_territory_store">Store</label>
+						        	<select name="frm_supplier_territory_store_2[]" multiple style="width:80%"  id="frm_supplier_territory_store_2" data-validation="">
+										<?php $arrStores = $db->getStoreData(); ?>								
+                                        <?php
+                                            
+                                            if (is_array($arrStores) && count($arrStores) > 0)
+                                            {
+                                                
+                                                foreach ($arrStores as $intStoreID=>$arrStoresData)
+                                                {
+                                                    echo '<option value="'.$intStoreID.'">'.$arrStoresData['store_name'].'</option>';
+                                                }
+                                                
+                                            }
+                                        ?>
+                                    </select>
+                                    <script>
+										$(function(){
+											$("#frm_supplier_territory_store_2").select2();
+											<?php if(isset($arrTerritory[1]['supplier_territory_store'])):?>
+												$("#frm_supplier_territory_store_2").select2('val',[<?php echo $arrTerritory[1]['supplier_territory_store'];?>]);
+											<?php endif;?>
+										});
+									</script>
+                                </div>
 
 					      		<input type="hidden" name="frm_supplier_territory_id_2" id="frm_supplier_territory_id_2" value="<?php if ($_REQUEST['frm_supplier_territory_id_2']) { echo stripslashes($_REQUEST['frm_supplier_territory_id_2']); } elseif (!$_REQUEST['frm_supplier_territory_id_2'] && $arrTerritory[1]['supplier_territory_id']) { echo stripslashes($arrTerritory[1]['supplier_territory_id']); } ?>" />
 
@@ -612,7 +671,7 @@
 
 
 					      	<div class="row-fluid" style="margin-top:20px;">	
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Area 3 -->
 						      		<label for="frm_territory_id_3">Area</label>
 						      		<!--
@@ -645,26 +704,53 @@
 						        	<p class="help-block">The supplier territory area</p>				        
 					      		</div>
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Name 3 -->
 						      		<label for="frm_supplier_territory_name_3">Territory Contact 3</label>
 						        	<input type="text" id="frm_supplier_territory_name_3" name="frm_supplier_territory_name_3" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_name_3']) { echo stripslashes($_REQUEST['frm_supplier_territory_name_3']); } elseif (!$_REQUEST['frm_supplier_territory_name_3'] && $arrTerritory[2]['supplier_territory_name']) { echo stripslashes($arrTerritory[2]['supplier_territory_name']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact name</p>				        
 						      	</div>				      	
 					      		
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Number 3 -->
 						      		<label for="frm_supplier_territory_phone_number_3">Contact Number</label>
 						        	<input type="text" id="frm_supplier_territory_phone_number_3" name="frm_supplier_territory_phone_number_3" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_phone_number_3']) { echo stripslashes($_REQUEST['frm_supplier_territory_phone_number_3']); } elseif (!$_REQUEST['frm_supplier_territory_phone_number_3'] && $arrTerritory[2]['supplier_territory_phone_number']) { echo stripslashes($arrTerritory[2]['supplier_territory_phone_number']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact number</p>				        
 					      		</div>
+                                
+                                <div class="span3">
+                                	<label for="frm_supplier_territory_store">Store</label>
+						        	<select name="frm_supplier_territory_store_3[]" multiple style="width:80%"  id="frm_supplier_territory_store_3" data-validation="">
+										<?php $arrStores = $db->getStoreData(); ?>								
+                                        <?php
+                                            
+                                            if (is_array($arrStores) && count($arrStores) > 0)
+                                            {
+                                                
+                                                foreach ($arrStores as $intStoreID=>$arrStoresData)
+                                                {
+                                                    echo '<option value="'.$intStoreID.'">'.$arrStoresData['store_name'].'</option>';
+                                                }
+                                                
+                                            }
+                                        ?>
+                                    </select>
+                                    <script>
+										$(function(){
+											$("#frm_supplier_territory_store_3").select2();
+											<?php if(isset($arrTerritory[2]['supplier_territory_store'])):?>
+												$("#frm_supplier_territory_store_3").select2('val',[<?php echo $arrTerritory[2]['supplier_territory_store'];?>]);
+											<?php endif;?>
+										});
+									</script>
+                                </div>
 
 					      		<input type="hidden" name="frm_supplier_territory_id_3" id="frm_supplier_territory_id_3" value="<?php if ($_REQUEST['frm_supplier_territory_id_3']) { echo stripslashes($_REQUEST['frm_supplier_territory_id_3']); } elseif (!$_REQUEST['frm_supplier_territory_id_3'] && $arrTerritory[2]['supplier_territory_id']) { echo stripslashes($arrTerritory[2]['supplier_territory_id']); } ?>" />
 
 					      	</div>		
 
 					      	<div class="row-fluid" style="margin-top:20px;">	
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Area 4 -->
 						      		<label for="frm_territory_id_4">Area</label>
 						      		<!--
@@ -697,26 +783,53 @@
 						        	<p class="help-block">The supplier territory area</p>
 						        </div>		
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Name 4 -->
 						      		<label for="frm_supplier_territory_name_4">Territory Contact 4</label>
 						        	<input type="text" id="frm_supplier_territory_name_4" name="frm_supplier_territory_name_4" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_name_4']) { echo stripslashes($_REQUEST['frm_supplier_territory_name_4']); } elseif (!$_REQUEST['frm_supplier_territory_name_4'] && $arrTerritory[3]['supplier_territory_name']) { echo stripslashes($arrTerritory[3]['supplier_territory_name']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact name</p>				        
 						      	</div>
 
-						      	<div class="span4">
+						      	<div class="span3">
 						        	<!-- Supplier Territory Contact Number 4 -->
 						      		<label for="frm_supplier_territory_phone_number_4">Contact Number</label>
 						        	<input type="text" id="frm_supplier_territory_phone_number_4" name="frm_supplier_territory_phone_number_4" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_phone_number_4']) { echo stripslashes($_REQUEST['frm_supplier_territory_phone_number_4']); } elseif (!$_REQUEST['frm_supplier_territory_phone_number_4'] && $arrTerritory[3]['supplier_territory_phone_number']) { echo stripslashes($arrTerritory[3]['supplier_territory_phone_number']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact number</p>				        
 					      		</div>
+                                
+                                <div class="span3">
+                                	<label for="frm_supplier_territory_store">Store</label>
+						        	<select name="frm_supplier_territory_store_4[]" multiple style="width:80%"  id="frm_supplier_territory_store_4" data-validation="">
+										<?php $arrStores = $db->getStoreData(); ?>								
+                                        <?php
+                                            
+                                            if (is_array($arrStores) && count($arrStores) > 0)
+                                            {
+                                                
+                                                foreach ($arrStores as $intStoreID=>$arrStoresData)
+                                                {
+                                                    echo '<option value="'.$intStoreID.'">'.$arrStoresData['store_name'].'</option>';
+                                                }
+                                                
+                                            }
+                                        ?>
+                                    </select>
+                                    <script>
+										$(function(){
+											$("#frm_supplier_territory_store_4").select2();
+											<?php if(isset($arrTerritory[3]['supplier_territory_store'])):?>
+												$("#frm_supplier_territory_store_4").select2('val',[<?php echo $arrTerritory[3]['supplier_territory_store'];?>]);
+											<?php endif;?>
+										});
+									</script>
+                                </div>
 
 					      		<input type="hidden" name="frm_supplier_territory_id_4" id="frm_supplier_territory_id_4" value="<?php if ($_REQUEST['frm_supplier_territory_id_4']) { echo stripslashes($_REQUEST['frm_supplier_territory_id_4']); } elseif (!$_REQUEST['frm_supplier_territory_id_4'] && $arrTerritory[3]['supplier_territory_id']) { echo stripslashes($arrTerritory[3]['supplier_territory_id']); } ?>" />
 
 					      	</div>				      		
 					      	
 					      	<div class="row-fluid" style="margin-top:20px;">	
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Area 5 -->
 						      		<label for="frm_territory_id_5">Area</label>
 						      		<!--
@@ -749,19 +862,46 @@
 						        	<p class="help-block">The supplier territory area</p>
 						        </div>		
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Name 5 -->
 						      		<label for="frm_supplier_territory_name_5">Territory Contact 5</label>
 						        	<input type="text" id="frm_supplier_territory_name_5" name="frm_supplier_territory_name_5" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_name_5']) { echo stripslashes($_REQUEST['frm_supplier_territory_name_5']); } elseif (!$_REQUEST['frm_supplier_territory_name_5'] && $arrTerritory[4]['supplier_territory_name']) { echo stripslashes($arrTerritory[4]['supplier_territory_name']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact name</p>				        
 						      	</div>
 
-						      	<div class="span4">
+						      	<div class="span3">
 						        	<!-- Supplier Territory Contact Number 5 -->
 						      		<label for="frm_supplier_territory_phone_number_5">Contact Number</label>
 						        	<input type="text" id="frm_supplier_territory_phone_number_5" name="frm_supplier_territory_phone_number_5" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_phone_number_5']) { echo stripslashes($_REQUEST['frm_supplier_territory_phone_number_5']); } elseif (!$_REQUEST['frm_supplier_territory_phone_number_5'] && $arrTerritory[4]['supplier_territory_phone_number']) { echo stripslashes($arrTerritory[4]['supplier_territory_phone_number']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact number</p>				        
 					      		</div>
+                                
+                                <div class="span3">
+                                	<label for="frm_supplier_territory_store">Store</label>
+						        	<select name="frm_supplier_territory_store_5[]" multiple style="width:80%"  id="frm_supplier_territory_store_5" data-validation="">
+										<?php $arrStores = $db->getStoreData(); ?>								
+                                        <?php
+                                            
+                                            if (is_array($arrStores) && count($arrStores) > 0)
+                                            {
+                                                
+                                                foreach ($arrStores as $intStoreID=>$arrStoresData)
+                                                {
+                                                    echo '<option value="'.$intStoreID.'">'.$arrStoresData['store_name'].'</option>';
+                                                }
+                                                
+                                            }
+                                        ?>
+                                    </select>
+                                    <script>
+										$(function(){
+											$("#frm_supplier_territory_store_5").select2();
+											<?php if(isset($arrTerritory[4]['supplier_territory_store'])):?>
+												$("#frm_supplier_territory_store_5").select2('val',[<?php echo $arrTerritory[4]['supplier_territory_store'];?>]);
+											<?php endif;?>
+										});
+									</script>
+                                </div>
 
 					      		<input type="hidden" name="frm_supplier_territory_id_5" id="frm_supplier_territory_id_5" value="<?php if ($_REQUEST['frm_supplier_territory_id_5']) { echo stripslashes($_REQUEST['frm_supplier_territory_id_5']); } elseif (!$_REQUEST['frm_supplier_territory_id_5'] && $arrTerritory[4]['supplier_territory_id']) { echo stripslashes($arrTerritory[4]['supplier_territory_id']); } ?>" />
 
@@ -769,7 +909,7 @@
 
 
 					      	<div class="row-fluid" style="margin-top:20px;">	
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Area 6 -->
 						        	<label for="frm_territory_id_6">Area</label>
 						      		<!--
@@ -802,19 +942,46 @@
 						        	<p class="help-block">The supplier territory area</p>
 						        </div>		
 
-					      		<div class="span4">
+					      		<div class="span3">
 						        	<!-- Supplier Territory Contact Name 6 -->
 						      		<label for="frm_supplier_territory_name_6">Territory Contact 6</label>
 						        	<input type="text" id="frm_supplier_territory_name_6" name="frm_supplier_territory_name_6" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_name_6']) { echo stripslashes($_REQUEST['frm_supplier_territory_name_6']); } elseif (!$_REQUEST['frm_supplier_territory_name_6'] && $arrTerritory[5]['supplier_territory_name']) { echo stripslashes($arrTerritory[5]['supplier_territory_name']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact name</p>				        
 						      	</div>
 
-						      	<div class="span4">
+						      	<div class="span3">
 						        	<!-- Supplier Territory Contact Number 6 -->
 						      		<label for="frm_supplier_territory_phone_number_6">Contact Number</label>
 						        	<input type="text" id="frm_supplier_territory_phone_number_6" name="frm_supplier_territory_phone_number_6" placeholder="" class="input-medium" value="<?php if ($_REQUEST['frm_supplier_territory_phone_number_6']) { echo stripslashes($_REQUEST['frm_supplier_territory_phone_number_6']); } elseif (!$_REQUEST['frm_supplier_territory_phone_number_6'] && $arrTerritory[5]['supplier_territory_phone_number']) { echo stripslashes($arrTerritory[5]['supplier_territory_phone_number']); } ?>" data-validation="" /> 
 						        	<p class="help-block">The supplier territory contact number</p>				        
 					      		</div>
+                                
+                                <div class="span3">
+                                	<label for="frm_supplier_territory_store">Store</label>
+						        	<select name="frm_supplier_territory_store_6[]" multiple style="width:80%"  id="frm_supplier_territory_store_6" data-validation="">
+										<?php $arrStores = $db->getStoreData(); ?>								
+                                        <?php
+                                            
+                                            if (is_array($arrStores) && count($arrStores) > 0)
+                                            {
+                                                
+                                                foreach ($arrStores as $intStoreID=>$arrStoresData)
+                                                {
+                                                    echo '<option value="'.$intStoreID.'">'.$arrStoresData['store_name'].'</option>';
+                                                }
+                                                
+                                            }
+                                        ?>
+                                    </select>
+                                    <script>
+										$(function(){
+											$("#frm_supplier_territory_store_6").select2();
+											<?php if(isset($arrTerritory[5]['supplier_territory_store'])):?>
+												$("#frm_supplier_territory_store_6").select2('val',[<?php echo $arrTerritory[5]['supplier_territory_store'];?>]);
+											<?php endif;?>
+										});
+									</script>
+                                </div>
 
 					      		<input type="hidden" name="frm_supplier_territory_id_6" id="frm_supplier_territory_id_6" value="<?php if ($_REQUEST['frm_supplier_territory_id_6']) { echo stripslashes($_REQUEST['frm_supplier_territory_id_6']); } elseif (!$_REQUEST['frm_supplier_territory_id_6'] && $arrTerritory[5]['supplier_territory_id']) { echo stripslashes($arrTerritory[5]['supplier_territory_id']); } ?>" />
 
@@ -910,7 +1077,13 @@
 			<script>
 
 			$(window).load(function() {
-    			$('#formtab-nav a:first').tab('show');
+				<?php if(isset($_REQUEST['tab'])){
+						$tab = $_REQUEST['tab'];
+				?>
+                	$('#formtab-nav a[href="#tab<?php echo $tab;?>"]').tab('show');
+				<?php } else { ?>
+    				$('#formtab-nav a:first').tab('show');
+				<?php }?>
 			});	
 
 			$(document).ready(function () {
@@ -919,6 +1092,21 @@
 				$('.btn-popover').popover({ 
 					trigger: 'hover',
 					placement: 'top'
+				});
+				
+				$('#frm_supplier_postal_address').on('keyup', function(){
+					var value = $(this).val();
+					$('.rep-address').val(value);
+				});
+				
+				$('#frm_supplier_phone_number').on('keyup', function(){
+					var value = $(this).val();
+					$('.rep-phone').val(value);
+				});
+				
+				$('#frm_supplier_email').on('keyup', function(){
+					var value = $(this).val();
+					$('.rep-email').val(value);
 				});
 
 				//-- Next Button 1
@@ -1074,7 +1262,8 @@
 		      			
 		      			<?php if ($_REQUEST['action'] == "edit") { ?>"&<?php echo $strPageIDName; ?>=" + <?php echo $_REQUEST[$strPageIDName]; ?> + "&" + <?php } ?>	
 
-						"frm_supplier_name=" + frm_supplier_name + "&frm_supplier_postal_address=" + frm_supplier_postal_address + "&frm_supplier_phone_number=" + frm_supplier_phone_number + "&frm_supplier_email=" + frm_supplier_email + "&frm_supplier_po_ref_number_required=" + frm_supplier_po_ref_number_required + "&frm_supplier_po_ref_number=" + frm_supplier_po_ref_number + "&frm_supplier_active=" + frm_supplier_active + "&" +
+		      			$("#frm_supplier").serialize();
+						/*"frm_supplier_name=" + frm_supplier_name + "&frm_supplier_postal_address=" + frm_supplier_postal_address + "&frm_supplier_phone_number=" + frm_supplier_phone_number + "&frm_supplier_email=" + frm_supplier_email + "&frm_supplier_po_ref_number_required=" + frm_supplier_po_ref_number_required + "&frm_supplier_po_ref_number=" + frm_supplier_po_ref_number + "&frm_supplier_active=" + frm_supplier_active + "&" +
 		      			"supplier_contact_id=" + supplier_contact_id + "&frm_supplier_contact_name=" + frm_supplier_contact_name + "&frm_supplier_contact_position=" + frm_supplier_contact_position + "&frm_supplier_contact_postal_address=" + frm_supplier_contact_postal_address + "&frm_supplier_contact_phone_number=" + frm_supplier_contact_phone_number + "&frm_supplier_contact_mobile_number=" + frm_supplier_contact_mobile_number + "&frm_supplier_contact_email=" + frm_supplier_contact_email + "&" + 
 		      			"supplier_account_id=" + supplier_account_id + "&frm_supplier_account_name=" + frm_supplier_account_name + "&frm_supplier_account_postal_address=" + frm_supplier_account_postal_address + "&frm_supplier_account_phone_number=" + frm_supplier_account_phone_number + "&frm_supplier_account_email=" + frm_supplier_account_email + "&" + 
 
@@ -1085,7 +1274,7 @@
 		      			"frm_territory_id_5=" + frm_territory_id_5 + "&frm_territory_name_5=" + frm_territory_name_5 + "&frm_supplier_territory_name_5=" + frm_supplier_territory_name_5 + "&frm_supplier_territory_phone_number_5=" + frm_supplier_territory_phone_number_5 + "&frm_supplier_territory_id_5=" + frm_supplier_territory_id_5 + "&" +
 		      			"frm_territory_id_6=" + frm_territory_id_6 + "&frm_territory_name_6=" + frm_territory_name_6 + "&frm_supplier_territory_name_6=" + frm_supplier_territory_name_6 + "&frm_supplier_territory_phone_number_6=" + frm_supplier_territory_phone_number_6 + "&frm_supplier_territory_id_6=" + frm_supplier_territory_id_6 + "&" +
 
-		      			"frm_supplier_last_year_purchase=" + frm_supplier_last_year_purchase + "&frm_supplier_target=" + frm_supplier_target + "&frm_supplier_growth_incentives=" + frm_supplier_growth_incentives + "&frm_supplier_budget=" + frm_supplier_budget;
+		      			"frm_supplier_last_year_purchase=" + frm_supplier_last_year_purchase + "&frm_supplier_target=" + frm_supplier_target + "&frm_supplier_growth_incentives=" + frm_supplier_growth_incentives + "&frm_supplier_budget=" + frm_supplier_budget;*/
 
 						var request = $.ajax({							    
 							url: "ajax/supplier_proc.php",
@@ -1179,7 +1368,13 @@
 				$("#frm_supplier_territory_phone_number_6").val("");
 				$("#frm_supplier_territory_id_6").val("");
 
+				$("#frm_supplier_last_year_purchase").val("");
+				$("#frm_supplier_target").val("");
+				$("#frm_supplier_growth_incentives").val("");
+				$("#frm_supplier_budget").val("");
+
 				// set to focus
+				$('#formtab-nav a[href="#tab1"]').tab('show');	
 				$("#frm_supplier_name").focus();
 			}
 			

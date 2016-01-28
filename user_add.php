@@ -203,7 +203,7 @@
 	            
             	<h2>New User</h2>	            
             	
-				<form id="frm_users" enctype="multipart/form-data" method="post" action="user_add_exec.php">
+				<form id="frm_users" class="form-horizontal" enctype="multipart/form-data" method="post" action="user_add_exec.php">
 				<input type="hidden" name="frm_action" value="add" />
 				
 				<div class="tabbable">
@@ -219,8 +219,8 @@
 							<fieldset>
 							    <div id="legend">
 							      	<legend class="">Login</legend>
-							    </div>
-							    
+							    </div>							   							    
+
 							    <div class="control-group">
 							      <!-- Username -->
 							      <label class="control-label" for="frm_user_login_name">Username</label>
@@ -253,7 +253,7 @@
 							      <!-- Type -->
 							      <label class="control-label" for="frm_user_level">Type</label>
 							      <div class="controls">
-							        Admin: <input type="radio" name="frm_user_level" value="admin"<?php if ($_REQUEST['frm_user_level'] == 'admin') { echo " checked=\"checked\""; } ?> /> User: <input type="radio" name="frm_user_level" value="user"<?php if ($_REQUEST['frm_user_level'] == 'user' || !$_REQUEST['frm_user_level']) { echo " checked=\"checked\""; } ?> /> * <br />
+							        Admin: <input type="radio" name="frm_user_level" id="frm_user_level_1" value="admin"<?php if ($_REQUEST['frm_user_level'] == 'admin') { echo " checked=\"checked\""; } ?> /> User: <input type="radio" name="frm_user_level" id="frm_user_level_2" value="user"<?php if ($_REQUEST['frm_user_level'] == 'user' || !$_REQUEST['frm_user_level']) { echo " checked=\"checked\""; } ?> /> * <br />
 							        <p class="help-block"></p>							        
 							      </div>
 							    </div>		
@@ -276,6 +276,10 @@
 												{
 													echo " selected=\"selected\"";
 												}
+
+												elseif (!$_REQUEST['frm_user_group_id'] && $intUserGroupID == 2) {
+													echo " selected=\"selected\"";
+												}
 												
 												echo ">" . stripslashes($arrUserGroupData['user_group_name']) . "</option>";
 											}
@@ -291,10 +295,8 @@
 							      <!-- Type -->
 							      <label class="control-label" for="frm_user_subscription_start">Active Period</label>
 							      <div class="controls">
-							        <label class="control-label" for="frm_user_subscription_start"> From</label> 
-							        <input type="text" id="frm_user_subscription_start" name="frm_user_subscription_start" placeholder="Type the date in yyyy-mm-dd format" class="input-small" value="<?php if ($_REQUEST['frm_user_subscription_start']) { echo stripslashes($_REQUEST['frm_user_subscription_start']); } else { echo date('d-m-Y'); } ?>" /> 
-							        <label class="control-label" for="frm_user_subscription_end"> to</label> 
-							        <input type="text" id="frm_user_subscription_end" name="frm_user_subscription_end" placeholder="Type the date in yyyy-mm-dd format" class="input-small" value="<?php if ($_REQUEST['frm_user_subscription_end']) { echo stripslashes($_REQUEST['frm_user_subscription_end']); } else { echo date('d-m-Y'); } ?>" /> 
+							        From <input type="text" id="frm_user_subscription_start" name="frm_user_subscription_start" placeholder="Type the date in yyyy-mm-dd format" class="input-small" value="<?php if ($_REQUEST['frm_user_subscription_start']) { echo stripslashes($_REQUEST['frm_user_subscription_start']); } else { echo date('d-m-Y'); } ?>" /> 
+							        to <input type="text" id="frm_user_subscription_end" name="frm_user_subscription_end" placeholder="Type the date in yyyy-mm-dd format" class="input-small" value="<?php if ($_REQUEST['frm_user_subscription_end']) { echo stripslashes($_REQUEST['frm_user_subscription_end']); } else { echo date('d-m-Y'); } ?>" /> 
 							        <p class="help-block"></p>							        
 							      </div>
 							    </div>
@@ -307,6 +309,8 @@
 									<p class="help-block"></p>
 									</div>	
 								</div>	
+
+								<br /><br />
 								
 								<div class="control-group">
 									<div class="controls">
@@ -361,6 +365,8 @@
 									</div>
 								</div>	
 
+								<br /><br />
+
 								<div class="control-group">
 									<div class="controls">
 										<button class="btn" type="button" name="frm_prev_1" id="frm_prev_1"><i class="icon-backward"></i> Previous</button>&nbsp;&nbsp;&nbsp; <input class="btn" type="submit" name="frm_submit" value="Submit" onclick="return validateUserAdd(this.form)" />										
@@ -376,7 +382,7 @@
 				</div> <!--.tabbable-->		  
 				
 				</form>
-				<p class="pull-right"><a class="btn" href="#top">Back to top</a></p>
+				<p class="pull-right"><a class="btn" href="#top"><i class="icon-arrow-up"></i> Back to top</a></p>
 				
 			
     
@@ -402,6 +408,37 @@
 				$('#formtab-nav a[href="#tab1"]').tab('show');
 			});
 					
+			//-- User Level
+			$('#frm_user_level_1').click(function() {				
+				if ($('#frm_user_level_1').val() == 'admin') 
+				{
+					$('#frm_user_group_id').val(1);
+				}
+			});
+
+			$('#frm_user_level_2').click(function() {				
+				if ($('#frm_user_level_2').val() == 'user') 
+				{
+					$('#frm_user_group_id').val(2);
+				}
+			});
+
+			//-- User Group
+			$('#frm_user_group_id').change(function() {
+				
+				if ($('#frm_user_group_id option:selected').val() == 1)
+				{
+					$('#frm_user_level_1').prop('checked', true);
+					$('#frm_user_level_2').prop('checked', false);
+				}
+
+				else if ($('#frm_user_group_id option:selected').val() == 2)
+				{
+					$('#frm_user_level_1').prop('checked', false);
+					$('#frm_user_level_2').prop('checked', true);
+				}
+
+			});
 		    
 		    $("#frm_user_subscription_start").datepicker({
 		      defaultDate: "+1w",
@@ -424,6 +461,9 @@
 		        $("#frm_user_subscription_start").datepicker( "option", "maxDate", selectedDate );
 		      }
 		    });
+
+		    $('#frm_user_subscription_end').datepicker("setDate", new Date(<?php echo intval(date('Y'))+1; ?>, <?php echo intval(date('m'))-1; ?>, <?php echo date('d'); ?>) );
+
 
 		});
     </script>

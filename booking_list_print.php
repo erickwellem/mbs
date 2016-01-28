@@ -9,9 +9,11 @@
 <title> Booking List | <?php echo stripslashes($arrSiteConfig['site_name']); ?></title> 
 	<meta name="description" content="<?php echo stripslashes($arrSiteConfig['site_description']); ?>" /> 
 	<?php include('inc/init.php'); ?>
+	<?php if(!isset($_REQUEST['print'])){?>
 	<style type="text/css">
 	body, #wrapper, #content-wrapper, #content, #box { background: none; }
 	</style>
+    <?php } ?>
 </head> 
 
 <body>
@@ -32,12 +34,12 @@
 
 				<div style="text-align:center;"><h2 style="font-size:1.2em;font-weight:bold;">Bookings</h2></div>
 				   		
-				<table class="table table-bordered">
+				<table class="table table-bordered" border="1" bordercolor="#333;">
 				  <tr>
-				  	<td><div style="width:80px;font-weight:bold;text-align:right;">No.</div></td>
+				  	<td><div style="width:10%;font-weight:bold;text-align:right;">No.</div></td>
 				   	<td><div style="font-weight:bold;">Date</div></td>
 				   	<td><div style="font-weight:bold;">Code / Name</div></td>				   	
-				   	<td><div style="font-weight:bold;">Supplier</div></td>				   	
+				   	<td><div style="font-weight:bold;">Activities</div></td>				   	
 				  </tr>
 
 		   		<?php
@@ -57,13 +59,69 @@
 							$arrDate = split("-", $row['booking_date']);
 							$strDate = $arrDate[2] . " " . $html->getMonthName(intval($arrDate[1])) . " " . $arrDate[0];
 							$strSupplierName = $db->dbIDToField('mbs_suppliers', 'supplier_id', $row['supplier_id'], 'supplier_name');
+							
+							// activities
+							$arrActivities = $db->getActivitiesInBooking($row['booking_id']);
 					?>
 								   			
 				   			<tr>
-				   				<td><div style="text-align:right;"><?php echo $intNo; ?></div></td>
-				   				<td><?php echo $strDate; ?></td>
-				   				<td><?php echo stripslashes($row['booking_code']); ?> / <?php echo stripslashes($row['booking_name']); ?></td>
-				   				<td><?php echo stripslashes($strSupplierName); ?></td>
+				   				<td valign="top"><div style="text-align:right;"><?php echo $intNo; ?></div></td>
+				   				<td valign="top"><?php echo $strDate; ?></td>
+				   				<td valign="top"><?php echo stripslashes($row['booking_code']); ?> / <?php echo stripslashes($row['booking_name']); ?></td>
+				   				<td>
+				   				<?php				
+				   					
+				   					if (is_array($arrActivities) && count($arrActivities) > 0)
+									{
+								?>										
+										<ul style="margin-left:20px;">
+
+									<?php		
+										for ($i = 0; $i < count($arrActivities); $i++)
+										{
+											$strActivityName = $db->dbIDToField('mbs_activities', 'activity_id', $arrActivities[$i]['activity_id'], 'activity_name');
+									?>
+											
+											<li><strong><?php echo $strActivityName; ?></strong> in <?php echo $html->getMonthName($arrActivities[$i]['booking_activity_month']) . " " . $arrActivities[$i]['booking_activity_year'];
+
+											$arrProducts = $db->getProductsInActivity($arrActivities[$i]['booking_activity_id']);									
+											
+											if(strpos($strActivityName, "Gondola End") !== false && strpos($strActivityName, "Supplier Merchandised") !== false){?>
+												<br><br /><em><u>Supplier Contact</u></em>;
+												<?php $rowSupplierAccount = DB::getSupplierAccount($row['supplier_id']);?>
+												<br>Name : <?php echo $rowSupplierAccount['supplier_contact_name'];?>
+												<br>Phone : <?php echo $rowSupplierAccount['supplier_contact_phone_number'];?>
+												<br>Email : <?php echo $rowSupplierAccount['supplier_contact_email'];?><br>
+											<?php } 
+											
+											if (is_array($arrProducts) && count($arrProducts) > 0)
+											{
+											?>	
+												<br /><em><u>Products:</u></em>
+												<ul style="margin-left:20px;">
+
+											<?php 		
+												for ($j = 0; $j < count($arrProducts); $j++)
+												{
+											?>		<li><?php echo $arrProducts[$j]['booking_product_name']; ?></li>
+											<?php } ?>
+											
+												</ul>
+											<?php	
+											}	
+											?>
+											</li>
+										<?php } ?>
+
+										</ul>
+									<?php } ?>
+
+									</div></td>														
+									<?php
+
+									echo $strResult;	
+									?>	
+				   				</td>
 				   			</tr>
 
 					<?php	
@@ -75,11 +133,13 @@
 
 			</div>	<!-- end #box -->	
 
-			<script>
-			$(document).ready(function () {
-				window.print();
-			});
-			</script>	
+			<?php if(!isset($_REQUEST['print'])){?>			
+				<script>
+					$(document).ready(function () {
+						window.print();
+					});
+				</script>
+            <?php } ?>
     
     	</div> <!-- end #content -->
     </div> <!-- end #content-wrapper -->   

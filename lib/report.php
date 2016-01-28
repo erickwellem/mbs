@@ -754,6 +754,2659 @@ class REPORT {
 	} // showReportActivityToAvailabilityByYear()
 
 
+	function getPagesTally($intSizeID)
+	{
+		switch ($intSizeID) {
+			case 1:
+				return 4;
+				break;
+			case 2:
+				return 4;
+				break;	
+			case 3:
+				return 8;
+				break;
+			case 4:
+				return 16;
+				break;
+			case 5:
+				return 1;
+				break;
+			case 6:
+				return 2;
+				break;			
+			default:
+				return 1;
+				break;
+		}
+	}
+
+	function showReportGeneralCatalogueByActivity($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " Catalogue";
+
+		$strTheme = $_REQUEST['frm_report_theme'];
+		$strQueryTheme = '';
+		if($strTheme == 'pharmacy4less'){
+			$strQueryTheme = '%Catalogue - Pharmacy4Less%';
+		}else if($strTheme == 'royyoung'){
+			$strQueryTheme = '%Catalogue - Roy Young%';
+		}else if($strTheme == 'in2health'){
+			$strQueryTheme = '%Catalogue - IN 2 Health%';
+		}else if($strTheme == 'themed-pharmacy4less'){
+			$strQueryTheme = '%Themed Catalogue - Pharmacy4Less%';
+		}else if($strTheme == 'themed-royyoung'){
+			$strQueryTheme = '%Themed Catalogue - Roy Young%';
+		}else{
+			$strQueryTheme = '%Catalogue - Pharmacy4Less%';
+		}
+		?>		
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Activity Size</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Activity</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">UPI Code</th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="text-align:left;" colspan="10"><strong>Single Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t2.`size_id` = 5
+											 AND t5.`activity_category` = 'catalogue' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . " 
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+							
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_code']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="10"><strong>Double Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t2.`size_id` = 6
+											 AND t5.`activity_category` = 'catalogue' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_code']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // 
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="10"><strong>Hero Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t2.`size_id` = 1
+											 AND t5.`activity_category` = 'catalogue' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_code']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+						
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}	
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="10"><strong>Half Page</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t2.`size_id` = 3
+											 AND t5.`activity_category` = 'catalogue' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_code']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="10"><strong>Full Page</strong></td>					
+				</tr>
+
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t2.`size_id` = 4
+											 AND t5.`activity_category` = 'catalogue' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_code']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else 
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php			
+
+	} // showReportGeneralCatalogueByActivity($intYearMonth)
+
+
+	function showReportGeneralCatalogueBySupplier($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " Catalogue";
+
+		$strTheme = $_REQUEST['frm_report_theme'];
+		$strQueryTheme = '';
+		if($strTheme == 'pharmacy4less'){
+			$strQueryTheme = '%Catalogue - Pharmacy4Less%';
+		}else if($strTheme == 'royyoung'){
+			$strQueryTheme = '%Catalogue - Roy Young%';
+		}else if($strTheme == 'in2health'){
+			$strQueryTheme = '%Catalogue - IN 2 Health%';
+		}else if($strTheme == 'themed-pharmacy4less'){
+			$strQueryTheme = '%Themed Catalogue - Pharmacy4Less%';
+		}else if($strTheme == 'themed-royyoung'){
+			$strQueryTheme = '%Themed Catalogue - Roy Young%';
+		}else{
+			$strQueryTheme = '%Catalogue - Pharmacy4Less%';
+		}
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Supplier</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Supplier</strong></th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Activity Size</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_category` = 'catalogue'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t4.`supplier_name`, t1.`booking_product_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							$data = array();
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$data[$i] = $rowProduct['supplier_id'];
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+
+								if ($data[$i-1] !== $data[$i-2])
+								{
+							?>		
+								<tr>
+									<td style="text-align:left;" colspan="9"><strong><?php echo stripslashes($strSupplierName); ?></strong></td>
+								</tr>
+							<?php
+
+								}
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strActivitySize); ?></td>								
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php			
+
+	} // showReportGeneralCatalogueBySupplier($intYearMonth)
+
+
+	function showReportGeneralCatalogueByProduct($intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " Catalogue";
+
+		$strTheme = $_REQUEST['frm_report_theme'];
+		$strQueryTheme = '';
+		if($strTheme == 'pharmacy4less'){
+			$strQueryTheme = '%Catalogue - Pharmacy4Less%';
+		}else if($strTheme == 'royyoung'){
+			$strQueryTheme = '%Catalogue - Roy Young%';
+		}else if($strTheme == 'in2health'){
+			$strQueryTheme = '%Catalogue - IN 2 Health%';
+		}else if($strTheme == 'themed-pharmacy4less'){
+			$strQueryTheme = '%Themed Catalogue - Pharmacy4Less%';
+		}else if($strTheme == 'themed-royyoung'){
+			$strQueryTheme = '%Themed Catalogue - Roy Young%';
+		}else{
+			$strQueryTheme = '%Catalogue - Pharmacy4Less%';
+		}
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Product</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;">No</th>
+					<th style="text-align:center;"><strong>Product</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Activity Size</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_category` = 'catalogue'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_name` LIKE '".$strQueryTheme."' 
+											 ORDER BY t1.`booking_product_name`, t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)	
+						{
+
+							$i = 0;						
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{													
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><strong><?php echo stripslashes($rowProduct['booking_product_name']); ?></strong></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strActivitySize); ?></td>								
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)	
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+	} // showReportGeneralCatalogueByProduct($intYearMonth)
+
+
+	function showReportGeneralInStoreAllStores($intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = "In-Store Activities <br /> " . HTML::getMonthName($intMonth) . " " . $intYear . " ";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">All Stores</h3></div>
+		
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th colspan="2" style="text-align:center;width:20%;"><strong>Store</strong></th>
+					<?php
+						// Get the In-Store activities
+						
+						$queryStore = "SELECT * FROM `mbs_stores` ORDER BY `store_name`";
+						$resultStore = mysql_query($queryStore);
+						
+						$arrayStore = array();
+			
+						while ($rowStore = mysql_fetch_assoc($resultStore))
+						{
+							$arrayStore[] = $rowStore;
+							?>
+                            	<th style="text-align:center;"><strong><?php echo htmlspecialchars($rowStore['store_name']); ?></strong></th>
+                            <?php
+						}
+						
+						$countArrayStore = count($arrayStore);
+						
+					?>
+				</tr>
+			  
+			</thead>
+
+			<tbody>
+					
+		<?php 		
+			
+			  $queryActivity = "SELECT * FROM `mbs_activities` WHERE `year`='$intYear' AND `activity_category` = 'in-store' AND `activity_store_related` = 'yes' ORDER BY `activity_name`";
+			  $resultActivity = mysql_query($queryActivity);
+			  
+			  while ($rowActivity = mysql_fetch_assoc($resultActivity)) 
+			  {	
+		?>
+						
+			<tr>
+				<td rowspan="2"><div style="text-align:left;"><?php echo htmlspecialchars($rowActivity['activity_name']); ?></div></td>
+                <td><div style="text-align:center;">Total</div></td>
+				
+				<?php 
+					
+					for ($i = 0; $i < $countArrayStore; $i++) 
+					{ 
+						$rowStore = $arrayStore[$i];
+						$arrInStoreResult = DB::checkActivityInStoreByDateTime($rowActivity['activity_id'], $rowStore['store_id'], $intYear, $intMonth);
+						
+						$strBookingCode = DB::dbIDToField('mbs_bookings', 'booking_id', $arrInStoreResult['booking_id'], 'booking_code');
+						$strBookingName = DB::dbIDToField('mbs_bookings', 'booking_id', $arrInStoreResult['booking_id'], 'booking_name');
+				?> 
+					<td><div style="text-align:right;"><?php echo $arrInStoreResult;?><?php //if (count($arrInStoreResult) > 1) { echo count($arrInStoreResult); } else { echo 0; } ?></div></td>
+					
+				<?php 
+					} // for () 
+				?>
+			</tr>
+            <tr>
+            	<td><div style="text-align:center;">Avail.</div></td>
+                <?php 
+					for ($i = 0; $i < $countArrayStore; $i++) 
+					{ 
+						$rowStore = $arrayStore[$i];
+						$arrInStoreResult = DB::checkActivityInStoreByDateTime($rowActivity['activity_id'], $rowStore['store_id'], $intYear, $intMonth);
+						
+						$strBookingCode = DB::dbIDToField('mbs_bookings', 'booking_id', $arrInStoreResult['booking_id'], 'booking_code');
+						$strBookingName = DB::dbIDToField('mbs_bookings', 'booking_id', $arrInStoreResult['booking_id'], 'booking_name');
+				?> 
+					<td><div style="text-align:right;"><?php echo (3-$arrInStoreResult);?><?php //if (count($arrInStoreResult) > 1) { echo 3-1; } else { echo 3; } ?></div></td>
+				
+				<?php 
+					} // for () 
+				?>
+            </tr>	
+		
+		<?php							
+			}	// while ($rowStore = mysql_fetch_assoc($resultStore))
+		?>
+					
+			</tbody>
+			<tfoot>
+				
+			</tfoot>					
+		</table>
+
+
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>In-Store Activities</strong></th>
+					<th style="text-align:center;">Products</th>
+					<th style="text-align:center;">Suppliers</th>
+					<th style="text-align:center;">Spots</th>
+					<th style="text-align:center;">Dollars</th>
+					<th style="text-align:center;">Month</th>
+					<th style="text-align:center;">Availability by Month</th>
+					<th style="text-align:center;">Availability by Year</th>					
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t2.`activity_id` = t5.`activity_id`
+											 AND t5.`activity_category` = 'in-store'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t5.`activity_name`, t1.`booking_product_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+							$i = 0;
+							$data = array();						
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$data[$i] = $rowProduct['activity_name'];
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								
+								if ($data[$i-1] !== $data[$i-2])
+								{
+							?>
+									<tr>
+										<td style="text-align:left;" colspan="9"><strong><?php echo stripslashes($rowProduct['activity_name']); ?></strong></td>
+									</tr>
+							<?php 		
+
+								}
+							?>
+								<tr>
+									<td style="text-align:left;"></td>								
+									<td style="text-align:left;"> <?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>								
+									<td style="text-align:right;"><?php echo stripslashes($strActivitySize); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_activity_price']); ?></td>
+									<td style="text-align:right;"><?php echo HTML::getMonthName($intMonth) . " " . $intYear; ?></td>
+									<td style="text-align:right;"></td>
+									<td style="text-align:right;"></td>								
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows())	
+						
+						else 
+						{
+							?>
+							<tr>
+								<td colspan="8"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}	
+						
+					} // if ($resultProduct)
+				?>
+
+				
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>
+
+		<?php	
+
+		// The Log	
+		$strLog = "View In-Store Activities for All Stores Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // function showReportGeneralInStoreAllStores($intYearMonth)
+
+
+	function showReportGeneralInStoreSingleStores($intStoreID, $intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$strStoreName = DB::dbIDToField('mbs_stores', 'store_id', intval($intStoreID), 'store_name');
+		$strReportTitle .= "In-Store Activities <br />" . $strStoreName . " Store ";
+
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle .= HTML::getMonthName($intMonth) . " " . $intYear;
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;">No</th>					
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Product</th>					
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 AND t5.`activity_category` = 'in-store'
+											 AND (`store_id` REGEXP '^" . intval($intStoreID) . ",' 
+											      OR `store_id` REGEXP '," . intval($intStoreID) . ",' 
+											      OR `store_id` REGEXP '," . intval($intStoreID) . "$' 
+											      OR `store_id` REGEXP '^" . intval($intStoreID) . "$') 	
+											 ORDER BY t5.`activity_name`, t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+							
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;	
+							$data = array();					
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{													
+								$data[$i] = $rowProduct['activity_name'];
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								
+								if ($data[$i-1] !== $data[$i-2])
+								{
+							?>
+									<tr>
+										<td style="text-align:left;" colspan="9"><strong><?php echo stripslashes($rowProduct['activity_name']); ?></strong></td>
+									</tr>
+							<?php		
+								}
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>																
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>																
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="3"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View In-Store by Month for Single Store Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // showReportGeneralInStoreSingleStores($intStoreID, $intYearMonth)
+
+
+	function showReportGeneralInStoreByYear($intStoreID, $intYear)
+	{
+		global $STR_URL;
+
+		$strStoreName = DB::dbIDToField('mbs_stores', 'store_id', intval($intStoreID), 'store_name');
+		$strReportTitle .= "In-Store Activities <br />" . $strStoreName . " Store " . $intYear;
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;"></h3></div>
+
+		<!-- In-Store -->		
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th rowspan="2" style="text-align:center;width:10%;"><strong>Year <?php echo $intYear; ?></strong></th>
+					<?php
+						// Get the In-Store activities
+						$queryInStore = "SELECT * FROM `mbs_activities` WHERE `year`='$intYear' AND `activity_category` = 'in-store' AND `activity_store_related` = 'yes' ORDER BY `activity_name`";
+						$resultInStore = mysql_query($queryInStore);
+
+						$intCountIntStore = mysql_num_rows($resultInStore);
+
+						$arrDataInStoreAct = array();
+						while ($rowInStore = mysql_fetch_assoc($resultInStore)) 
+						{
+							$arrDataInStoreAct[] = $rowInStore;	
+							?>
+								<th style="text-align:center;" colspan="2"><strong><?php echo htmlspecialchars($rowInStore['activity_name']); ?></strong></th>
+								
+							<?php
+						}
+					
+					?>
+				</tr>
+
+				<tr>
+					
+					<?php for ($i = 0; $i < count($arrDataInStoreAct); $i++) { ?> 
+					<td><div style="text-align:center;">Total</div></td>
+					<td><div style="text-align:center;">Avail.</div></td>
+					<?php } ?>
+				</tr>
+							  
+			</thead>
+
+			<tbody>
+					
+		<?php 
+		
+			$queryStore = "SELECT * FROM `mbs_stores` ORDER BY `store_name`";
+			$resultStore = mysql_query($queryStore);
+
+			for ($j = 1; $j <= 12; $j++)
+			{
+				
+		?>
+						
+			<tr>
+				<td><div style="text-align:left;"><?php echo HTML::getMonthName($j); ?></div></td>	
+				
+				<?php 
+					for ($i = 0; $i < $intCountIntStore; $i++) 
+					{
+						$arrInStoreResult = DB::checkActivityInStoreByDateTime($arrDataInStoreAct[$i]['activity_id'], $intStoreID, $intYear, $j);
+				?> 
+					<td><div style="text-align:right;"><?php echo $arrInStoreResult;//if (count($arrInStoreResult) > 1) { echo 1; } else { echo 0; } ?></div></td>
+					<td><div style="text-align:right;"><?php echo (3-$arrInStoreResult);//if (count($arrInStoreResult) > 1) { echo 3-1; } else { echo 3; } ?></div></td>
+				
+				<?php 
+					} // for () 
+				?>
+			</tr>	
+		
+		<?php							
+			}	// for ($j = 1; $j <= 12; $j++)
+		?>
+					
+			</tbody>
+			<tfoot>
+				
+			</tfoot>					
+		</table>
+
+		<?php
+
+		// The Log	
+		$strLog = "View In-Store Activities by Year of " .  $intYear . " Report for \"" . $strStoreName . "\" store";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // showReportGeneralInStoreByYear($intStoreID, $intYear)
+
+
+	function showReportGeneralNewspaperByActivity($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " Newspaper";
+
+		?>		
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Activity Size</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Activity</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Single Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 5 
+											 AND t5.`activity_category` = 'newspaper' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+							
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Double Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 6 
+											 AND t5.`activity_category` = 'newspaper' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // 
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Hero Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 1 
+											 AND t5.`activity_category` = 'newspaper' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+						
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}	
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Half Page</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 3 
+											 AND t5.`activity_category` = 'newspaper' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Full Page</strong></td>					
+				</tr>
+
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 4 
+											 AND t5.`activity_category` = 'newspaper' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else 
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View Newspaper by Month by Activity Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);		
+
+	} // showReportGeneralNewspaperByActivity($intYearMonth)
+
+
+	function showReportGeneralNewspaperByProduct($intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " Newspaper";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Product</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;">No</th>
+					<th style="text-align:center;"><strong>Product</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Activity Size</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_category` = 'newspaper'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t1.`booking_product_name`, t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)	
+						{
+
+							$i = 0;						
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{													
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><strong><?php echo stripslashes($rowProduct['booking_product_name']); ?></strong></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strActivitySize); ?></td>								
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)	
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View Newspaper by Month by Product Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // showReportGeneralNewspaperByProduct($intYearMonth)
+
+	function showReportGeneralNewspaperBySupplier($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " Newspaper";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Supplier</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Supplier</strong></th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Activity Size</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_category` = 'newspaper'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`, t1.`booking_product_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							$data = array();
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$data[$i] = $rowProduct['supplier_id'];
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+
+								if ($data[$i-1] !== $data[$i-2])
+								{
+							?>		
+								<tr>
+									<td style="text-align:left;" colspan="9"><strong><?php echo stripslashes($strSupplierName); ?></strong></td>
+								</tr>
+							<?php
+
+								}
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strActivitySize); ?></td>								
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View Newspaper by Month by Supplier Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);		
+
+	} // showReportGeneralNewspaperBySupplier($intYearMonth)
+
+
+	function showReportGeneralEmailByActivity($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " 4YOU Email";
+
+		?>		
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Activity Size</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Activity</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Single Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 5 
+											 AND t5.`activity_category` = 'email' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+							
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Double Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 6 
+											 AND t5.`activity_category` = 'email' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // 
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Hero Spot</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 1 
+											 AND t5.`activity_category` = 'email' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+						
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}	
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Half Page</strong></td>
+				</tr>
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 3 
+											 AND t5.`activity_category` = 'email' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				<tr>
+					<td style="text-align:left;" colspan="9"><strong>Full Page</strong></td>					
+				</tr>
+
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id`
+											 AND t5.`activity_id` = t2.`activity_id`
+											 AND t2.`size_id` = 4 
+											 AND t5.`activity_category` = 'email' 
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`";
+
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+
+							$i = 0;
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else 
+						{
+							?>
+							<tr>
+								<td colspan="9"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php
+
+		// The Log	
+		$strLog = "View 4YOU Email by Month by Activity Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);			
+
+	} // showReportGeneralEmailByActivity($intYearMonth)
+
+
+	function showReportGeneralEmailByProduct($intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " 4YOU Email";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Product</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;">No</th>
+					<th style="text-align:center;"><strong>Product</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Activity Size</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_category` = 'email'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t1.`booking_product_name`, t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)	
+						{
+
+							$i = 0;						
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{													
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><strong><?php echo stripslashes($rowProduct['booking_product_name']); ?></strong></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strActivitySize); ?></td>								
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)	
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View 4YOU Email by Month by Product Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // showReportGeneralEmailByProduct($intYearMonth)
+
+
+	function showReportGeneralEmailBySupplier($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " 4YOU Email";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Supplier</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Supplier</strong></th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Activity Size</th>
+					<th style="text-align:center;">Normal Retail</th>
+					<th style="text-align:center;">Promo Price</th>
+					<th style="text-align:center;">Cost Price</th>
+					<th style="text-align:center;">RRP</th>
+					<th style="text-align:center;">SAVE</th>
+					<th style="text-align:center;">Pages Tally</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_category` = 'email'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`, t1.`booking_product_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							$data = array();
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$data[$i] = $rowProduct['supplier_id'];
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+
+								if ($data[$i-1] !== $data[$i-2])
+								{
+							?>		
+								<tr>
+									<td style="text-align:left;" colspan="9"><strong><?php echo stripslashes($strSupplierName); ?></strong></td>
+								</tr>
+							<?php
+
+								}
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes($strActivitySize); ?></td>								
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_normal_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_promo_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_cost_price']); ?></td>
+									<td style="text-align:right;">$<?php echo stripslashes($rowProduct['booking_product_recommended_retail_price']); ?></td>
+									<td style="text-align:right;">$<?php echo (floatval($rowProduct['booking_product_recommended_retail_price']) - floatval($rowProduct['booking_product_promo_price'])); ?></td>
+									<td style="text-align:right;"><?php echo $intPagesTally; ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="10"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View 4YOU Email by Month by Supplier Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);		
+
+	} // showReportGeneralEmailBySupplier($intYearMonth)
+
+
+	function showReportGeneralPREPSchoolByProduct($intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " PREP School";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Product</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;">No</th>
+					<th style="text-align:center;"><strong>Product</strong></th>
+					<th style="text-align:center;">Supplier</th>
+					<th style="text-align:center;">Date</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_name` LIKE '%PREP School%'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t1.`booking_product_name`, t4.`supplier_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+						
+						if (mysql_num_rows($resultProduct) > 0)	
+						{
+
+							$i = 0;						
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{													
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><strong><?php echo stripslashes($rowProduct['booking_product_name']); ?></strong></td>
+									<td style="text-align:left;"><?php echo stripslashes($strSupplierName); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes(HTML::convertDate($rowProduct['booking_date'])); ?></td>
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+
+						} // if (mysql_num_rows($resultProduct) > 0)	
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="4"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+				
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View PREP School by Month by Product Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // showReportGeneralPREPSchoolByProduct($intYearMonth)
+
+
+	function showReportGeneralPREPSchoolBySupplier($intYearMonth)
+	{	
+
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = HTML::getMonthName($intMonth) . " " . $intYear . " PREP School";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">Report by Supplier</h3></div>
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;"><strong>Supplier</strong></th>
+					<th style="text-align:center;">Product</th>
+					<th style="text-align:center;">Date</th>					
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+					$queryProduct = "SELECT * FROM `mbs_bookings_products` t1, 
+												   `mbs_bookings_activities` t2,  
+												   `mbs_bookings` t3,
+												   `mbs_suppliers` t4,
+												   `mbs_activities` t5
+											 WHERE t1.`booking_activity_id` = t2.`booking_activity_id` 
+											 AND t1.`booking_id` = t3.`booking_id`
+											 AND t3.`supplier_id` = t4.`supplier_id` 
+											 AND t5.`activity_id` = t2.`activity_id` 
+											 AND t5.`activity_name` LIKE '%PREP School%'
+											 AND t2.`booking_activity_year` = " . $intYear . " 
+											 AND t2.`booking_activity_month` = " . $intMonth . "
+											 ORDER BY t4.`supplier_name`, t1.`booking_product_name`";
+					//echo $queryProduct;						 
+					$resultProduct = mysql_query($queryProduct);
+
+					if ($resultProduct)
+					{
+
+						if (mysql_num_rows($resultProduct) > 0)
+						{
+
+							$i = 0;
+							$data = array();
+							while ($rowProduct = mysql_fetch_assoc($resultProduct)) 
+							{						
+								$data[$i] = $rowProduct['supplier_id'];
+								$i++;
+
+								$intSupplierID = DB::dbIDToField('mbs_bookings', 'booking_id', $rowProduct['booking_id'], 'supplier_id');
+								$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', $intSupplierID, 'supplier_name');
+								$strActivitySize = DB::dbIDToField('mbs_sizes', 'size_id', $rowProduct['size_id'], 'size_name');
+								$intPagesTally = REPORT::getPagesTally($rowProduct['size_id']);
+
+								if ($data[$i-1] !== $data[$i-2])
+								{
+							?>		
+								<tr>
+									<td style="text-align:left;" colspan="4"><strong><?php echo stripslashes($strSupplierName); ?></strong></td>
+								</tr>
+							<?php
+
+								}
+							?>
+								<tr>
+									<td style="text-align:right;"><?php echo $i; ?></td>								
+									<td style="text-align:left;"><?php echo stripslashes($rowProduct['booking_product_name']); ?></td>
+									<td style="text-align:left;"><?php echo stripslashes(HTML::convertDate($rowProduct['booking_date'])); ?></td>								
+									
+								</tr>
+
+							<?php
+
+							} // while($rowProduct)
+						
+						} // if (mysql_num_rows($resultProduct) > 0)
+
+						else
+						{
+							?>
+							<tr>
+								<td colspan="4"><div style="text-align:center;"><em>No data was found</em></div></td>	
+							</tr>
+							<?php
+						}
+
+					} // if ($resultProduct)
+				?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View PREP School by Month by Supplier Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);		
+
+	} // showReportGeneralPREPSchoolBySupplier($intYearMonth)
+
+
 	function showReportGeneralMonthly($intMonth, $intYear)
 	{
 
@@ -1284,6 +3937,201 @@ class REPORT {
 
 	} // showReportGeneralYearly($intYear)
 
+	function showReportGeneralDepartments($intYearMonth)
+	{
+		global $STR_URL;		
+		
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle = "Catalogue Booked Activity by Department <br /> " . HTML::getMonthName($intMonth) . " " . $intYear . " ";
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		<div style="clear:both;"><h3 style="font-size:1.3em;">All Departments</h3></div>
+        
+        <!-- In-Store ------------------------------------------------------------------------>		
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="text-align:center;width:50%;"><strong>Departments</strong></th>
+                    <th style="text-align:center;"><strong>Total</strong></th>
+
+
+                   
+
+
+
+				</tr>
+			  
+			</thead>
+
+			<tbody>
+					
+		<?php 		
+			
+			  $queryInStore = "SELECT * FROM `mbs_departments` ORDER BY `department_name`";
+			  $resultInStore = mysql_query($queryInStore);
+
+			  while ($rowInStore = mysql_fetch_assoc($resultInStore)) 
+			  {	
+		?>
+						
+			<tr>
+				<td><div style="text-align:left;"><?php echo htmlspecialchars($rowInStore['department_name']); ?></div></td>
+           			<?php
+           				$department_id=$rowInStore['department_id'];
+						$result_department_id = mysql_query("SELECT COUNT(*) FROM mbs_bookings_products WHERE mbs_bookings_products.booking_department_id = $department_id and DATE_FORMAT(booking_product_created_date,'%c')=$intMonth and DATE_FORMAT(booking_product_created_date,'%Y')=$intYear");
+						$count_department_id = mysql_result($result_department_id, 0); 
+
+					?>
+
+					<td style="width:40%;"><div style="text-align:center;"><?php echo $count_department_id; ?></div></td>
+					
+
+			</tr>
+           	
+		
+		<?php							
+			}	// while ($rowStore = mysql_fetch_assoc($resultStore))
+		?>
+					
+			</tbody>
+			<tfoot>
+				
+			</tfoot>					
+		</table>
+
+
+		
+
+		<?php	
+
+		// The Log	
+		$strLog = "View In-Store Activities for All Stores Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+	} // function showReportGeneralDepartments($intYearMonth)
+
+
+	// function showReportBookingBySupplier($intSupplierID, $intYearMonth)
+	function showReportBookingBySupplier($intSupplierID, $intYearMonth)
+	{
+
+
+		global $STR_URL;		
+		
+		$strSupplierName = DB::dbIDToField('mbs_suppliers', 'supplier_id', intval($intSupplierID), 'supplier_name');
+		$strReportTitle .= "Bookings Activities By Supplier <br />" . $strSupplierName . " Supplier ";
+
+		$intMonth = intval(substr($intYearMonth, -2, 2));
+		$intYear = intval(substr($intYearMonth, 0, 4));
+		$strReportTitle .= HTML::getMonthName($intMonth) . " " . $intYear;
+
+		$booking_id=1;
+
+		?>
+
+		<div style="clear:both;text-align:center;"><h2><?php echo $strReportTitle; ?></h3></div>
+		
+		<table class="table table-bordered table-hover">
+			<thead class="well">					
+				<tr>
+					<th style="width:20%;" style="text-align:center;">Month/Year</th>					
+					<th style="width:60%;" style="text-align:center;">Booking Activity Description</th>
+					<th style="width:20%;" style="text-align:center;">Price</th>
+				</tr>
+			</thead>
+			<tbody>				
+				<?php 
+						$booking = array();
+						$querybookingid="SELECT * FROM mbs_bookings WHERE supplier_id='$intSupplierID'";
+						//echo $querybookingid;
+						$resultInquerybookingid = mysql_query($querybookingid);
+						while ($rowBookingId = mysql_fetch_assoc($resultInquerybookingid)) 
+							{						
+								$booking[] = $rowBookingId['booking_id'];
+								$i++;
+							}
+
+						$bookingid=implode(",", $booking);
+					  	$queryInSupplier = "SELECT * FROM mbs_bookings_activities WHERE booking_activity_year=$intYear and booking_activity_month=$intMonth and booking_id in ($bookingid)";
+					  	//echo $queryInSupplier;
+					  	$resultInSupplier = mysql_query($queryInSupplier);
+					  
+					  	if ($resultInSupplier)
+						{
+							if (mysql_num_rows($resultInSupplier) > 0)
+							{
+							  	while ($rowInSupplier = mysql_fetch_assoc($resultInSupplier)) 
+							  	{	
+									?>
+											
+								<tr>
+									<td><?php echo HTML::getMonthName($rowInSupplier['booking_activity_month']); ?> <?php echo stripslashes($rowInSupplier['booking_activity_year']); ?></td>
+									<td><?php echo stripslashes($rowInSupplier['booking_activity_description']); ?></td>
+									<td><div style="width:10%;" style="text-align:left;"><?php echo htmlspecialchars($rowInSupplier['booking_activity_price']); ?></div></td>
+								</tr>
+								<?php							
+									}	// while ($rowStore = mysql_fetch_assoc($resultStore))
+								
+							}
+
+							else
+							{
+								?>
+								<tr>
+									<td colspan="3"><div style="text-align:center;"><em>No data was found</em></div></td>	
+								</tr>
+								<?php
+							}
+
+						}?>
+
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>	
+
+		<?php	
+
+		// The Log	
+		$strLog = "View In-Store by Month for Single Store Report for \"" . HTML::getMonthName($intMonth) . " " . $intYear . "\"";
+			
+		$queryLog = "INSERT INTO `logs` (`log_id`, 
+										 `log_user`, 
+										 `log_action`, 
+										 `log_time`, 
+										 `log_from`, 
+										 `log_logout`)
+
+					VALUES (NULL, 
+							'" . $_SESSION['user']['login_name'] . "',
+							'" . mysql_real_escape_string($strLog) . "',
+							'" . date('Y-m-d H:i:s') . "',
+							'" . $_SESSION['user']['ip_address'] . "', 
+							NULL)";			
+			
+		$resultLog = mysql_query($queryLog);
+
+
+		
+	} // function showReportBySupplier($intProductID)
 
 }	
 ?>

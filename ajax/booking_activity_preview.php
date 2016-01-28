@@ -1,10 +1,18 @@
 <?php
+/**************************************************************************************************
+ * EW Web Apps Process File
+ * @Author		: Erick Wellem (me@erickwellem.com)
+ * 				  October 2009
+ *				  This version: February 2013
+ * 		
+ * @Desc: Process file using Ajax
+ **************************************************************************************************/
 
-session_start();
 include('../config.php');
 require_once('../lib/db.php');
 require_once('../lib/admin.php');
 require_once('../lib/html.php');
+session_start();
 
 $db = new DB();
 $admin = new ADMIN();
@@ -54,8 +62,12 @@ if ($_REQUEST['booking_id'])
 									  	<td><?php echo $html->getMonthName($arrBookingActivityData[$i]['booking_activity_month']); ?> <?php echo stripslashes($arrBookingActivityData[$i]['booking_activity_year']); ?></td>
 									  	<td><?php echo stripslashes($arrBookingActivityData[$i]['booking_activity_description']); ?></td>
 									  	<td style="width:10%;"><div style="text-align:right;">$<?php echo number_format($strPrice, 2); ?></div></td>
-									  	<td style="width:20%;"><div style="text-align:center;"><button type="button" class="btn" id="frm_activity_edit_<?php echo $arrBookingActivityData[$i]['booking_activity_id']; ?>"><img src="<?php echo $STR_URL; ?>img/edit_icon.png" /> Edit</button> 
-									  		&nbsp;&nbsp;&nbsp; 
+									  	<td style="width:20%;">
+									  		<div style="text-align:center;">
+									  		<?php if ($_REQUEST['action'] == 'edit' && $_REQUEST['booking_id']) { ?>
+									  		<button type="button" class="btn" id="frm_activity_edit_<?php echo $arrBookingActivityData[$i]['booking_activity_id']; ?>"><img src="<?php echo $STR_URL; ?>img/edit_icon.png" /> Edit</button> 
+									  		&nbsp;&nbsp;&nbsp;	
+									  		<?php } ?>										  		 
 									  		<button type="button" class="btn" id="frm_activity_delete_<?php echo $arrBookingActivityData[$i]['booking_activity_id']; ?>"><img src="<?php echo $STR_URL; ?>img/delete_icon.png" /> Remove</a>
 									  	    </div></td>
 									</tr>
@@ -154,10 +166,12 @@ if ($_REQUEST['booking_id'])
 		    								<?php if (count($arrProducts) > 0) {?>
 		    								<?php for ($k = 0; $k < count($arrProducts); $k++) {?> 
 		    									$('#frm_booking_product_code').val('<?php echo $arrProducts[$k]['booking_product_code']; ?>');
+		    									$('#frm_booking_department_id').val('<?php echo $arrProducts[$k]['booking_department_id']; ?>');
 		    									$('#frm_booking_product_name').val('<?php echo $arrProducts[$k]['booking_product_name']; ?>');
 		    									$('#frm_booking_product_normal_retail_price').val('<?php echo $arrProducts[$k]['booking_product_normal_retail_price']; ?>');
 		    									$('#frm_booking_product_promo_price').val('<?php echo $arrProducts[$k]['booking_product_promo_price']; ?>');
 		    									$('#frm_booking_product_cost_price').val('<?php echo $arrProducts[$k]['booking_product_cost_price']; ?>');
+		    									$('#frm_booking_product_discount').val('<?php echo $arrProducts[$k]['booking_product_discount']; ?>');
 		    									$('#frm_booking_product_recommended_retail_price').val('<?php echo $arrProducts[$k]['booking_product_recommended_retail_price']; ?>');
 		      									$('#frm_booking_product_special_offer_details').val('<?php echo $arrProducts[$k]['booking_product_special_offer_details']; ?>');
 		      									

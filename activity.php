@@ -219,7 +219,7 @@
 			    <div class="control-group">
 			      <!-- Activity Category -->
 			      <label class="control-label" for="frm_activity_category">Category</label>
-			      <div class="controls">
+			      <div class="controls">	
 			        <select name="frm_activity_category" id="frm_activity_category" data-validation="required">
 			        	<option value=""> --Please select -- </option>
 			        	<option value="in-store"<?php if ($_REQUEST['frm_activity_category'] && $_REQUEST['frm_activity_category'] == 'in-store') { echo " selected=\"selected\""; } elseif (!$_REQUEST['frm_activity_category'] && $row['activity_category'] == 'in-store') { echo " selected=\"selected\""; } ?>>In-Store Activity</option>
@@ -238,6 +238,15 @@
 			      <div class="controls">			      	
 			        <input type="text" id="frm_activity_price" name="frm_activity_price" placeholder="Type activity price" class="input-xlarge" value="<?php if ($_REQUEST['frm_activity_price']) { echo stripslashes($_REQUEST['frm_activity_price']); } elseif (!$_REQUEST['frm_activity_price'] && $row['activity_price']) { echo stripslashes($row['activity_price']); } ?>" data-validation="required" /> *	        			        
 			        <p class="help-block">The activity price. Only numeric is allowed</p>			        
+			      </div>
+			    </div>
+                
+                <div class="control-group">
+			      <!-- Activity Price -->
+			      <label class="control-label" for="frm_year">Year</label>
+			      <div class="controls">			      	
+			        <input type="text" id="frm_year" name="frm_year" placeholder="Year" class="input-xlarge" value="<?php if ($_REQUEST['frm_year']) { echo stripslashes($_REQUEST['frm_year']); } elseif (!$_REQUEST['frm_year'] && $row['year']) { echo stripslashes($row['year']); } ?>" data-validation="required" /> *	        			        
+			        <p class="help-block">Year. Only numeric is allowed</p>			        
 			      </div>
 			    </div>
 			 
@@ -341,6 +350,7 @@
 	    			var frm_activity_name = $("#frm_activity_name").val();
 	    			var frm_activity_category = $("#frm_activity_category").val();
 	    			var frm_activity_price = $("#frm_activity_price").val();
+	      			var frm_year = $("#frm_year").val();
 	      			var frm_activity_description = $("#frm_activity_description").val();
 	      			var frm_size_id = $("#frm_size_id").val();
 	      			var frm_activity_store_related; if ($('#frm_activity_store_related').is(":checked")) { frm_activity_store_related = $("#frm_activity_store_related").val(); } else { frm_activity_store_related = "no"; }
@@ -353,7 +363,7 @@
 	      			
 		      			<?php if ($_REQUEST['action'] == "edit") { ?>"&<?php echo $strPageIDName; ?>=" + <?php echo $_REQUEST[$strPageIDName]; ?> + "&" + <?php } ?>	
 
-						"frm_activity_name=" + frm_activity_name + "&frm_activity_category=" + frm_activity_category + "&frm_activity_price=" + frm_activity_price + "&frm_activity_description=" + frm_activity_description + "&frm_size_id=" + frm_size_id + "&frm_activity_store_related=" + frm_activity_store_related + "&frm_activity_active=" + frm_activity_active;
+						"frm_activity_name=" + frm_activity_name + "&frm_activity_category=" + frm_activity_category + "&frm_activity_price=" + frm_activity_price + "&frm_activity_description=" + frm_activity_description + "&frm_size_id=" + frm_size_id + "&frm_activity_store_related=" + frm_activity_store_related + "&frm_activity_active=" + frm_activity_active + "&frm_year=" + frm_year;
 		      				   
 						var request = $.ajax({							    
 							url: "ajax/activity_proc.php",

@@ -9,9 +9,11 @@
 <title> Size List | <?php echo stripslashes($arrSiteConfig['site_name']); ?></title> 
 	<meta name="description" content="<?php echo stripslashes($arrSiteConfig['site_description']); ?>" /> 
 	<?php include('inc/init.php'); ?>
+	<?php if(!isset($_REQUEST['print'])):?>	
 	<style type="text/css">
 	body, #wrapper, #content-wrapper, #content, #box { background: none; }
 	</style>
+	<?php endif;?>
 </head> 
 
 <body> 
@@ -32,7 +34,7 @@
 
 				<div style="text-align:center;clear:both;"><h2 style="font-size:1.2em;font-weight:bold;">Size</h2></div>
 				   		
-				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#ccc">
+				<table class="table table-bordered" border="1" cellpadding="5" cellspacing="0" bordercolor="#333;">
 				  <tr>
 				  	<td><div style="width:80px;font-weight:bold;text-align:right;">No.</div></td>
 				   	<td><div style="font-weight:bold;">Name</div></td>
@@ -69,11 +71,13 @@
 
 			</div>	<!-- end #box -->	
 
-			<script>
-			$(document).ready(function () {
-				window.print();
-			});
-			</script>	
+			<?php if(!isset($_REQUEST['print'])){?>			
+				<script>
+					$(document).ready(function () {
+						window.print();
+					});
+				</script>
+            <?php } ?>
     
     	</div> <!-- end #content -->
     </div> <!-- end #content-wrapper -->   

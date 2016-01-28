@@ -26,56 +26,73 @@
 
 			<div id="box" class="span12">
 
-		   		<div class="container-fluid">
+				<div class="container-fluid">
 					<div class="row-fluid">
 						
-						<form id="frm_email" class="form-horizontal" action="" method="post">	
-							<fieldset>
-								<div id="legend">
-									<legend class="">Send to Email</legend>
-								</div>
-								
-								<input type="hidden" name="action" id="action" value="email_list" />
-										    
-								<!-- Recipient -->										    
-								<div class="control-group">
-									<label class="control-label" for="frm_email_to">To</label>
-									<div class="controls">
-										<input type="text" id="frm_email_to" name="frm_email_to" placeholder="Type recipient's email" class="input-xlarge" value="<?php if ($_REQUEST['frm_email_to']) { echo stripslashes($_REQUEST['frm_email_to']); } ?>" data-validation="validate_email" /> * 
-										<p class="help-block"></p>
-									</div>
-								</div>
-
-								<!-- Additional Message -->
-								<div class="control-group">
-									<label class="control-label" for="frm_message">Additional message</label>
-									<div class="controls">
-										<textarea id="frm_message" name="frm_message" placeholder="Type additional message to the recipient" class="input-xlarge" value="<?php if ($_REQUEST['frm_message']) { echo stripslashes($_REQUEST['frm_message']); } ?>" row="3" data-validation="" /></textarea> (optional) 
-										<p class="help-block"></p>
-									</div>
-								</div>
-
-								<!-- Send a Copy -->
-								<div class="control-group">
-									<label class="control-label" for="frm_send_copy">Send me a copy</label>
-									<div class="controls">
-										<input type="checkbox" id="frm_send_copy" name="frm_send_copy" value="yes" /> (optional) 
-										<p class="help-block">Check to send a copy to my email: <?php echo $strEmail; ?></p>
-									</div>
-								</div>	
-
-								<div class="control-group">									
-									<div class="controls">
-										<button class="btn btn-submit" type="button">Send</button>
-									</div>
-								</div>
-
-							</fieldset>
-						</form>	
-
+                        <ul class="nav nav-tabs" style="background:none">
+                          <li class="active"><a href="#sendtoemail" data-toggle="tab">Send to Email</a></li>
+                          <li><a href="#preview-sendtoemail" data-toggle="tab">Preview</a></li>
+                        </ul>
+                         
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="sendtoemail">
+                          	<form id="frm_email" class="form-horizontal" action="" method="post">	
+                                <fieldset>
+                                    <div id="legend">
+                                        <legend class="">Send to Email</legend>
+                                    </div>
+                                    
+                                    <input type="hidden" name="action" id="action" value="email_list" />
+                                                
+                                    <!-- Recipient -->										    
+                                    <div class="control-group">
+                                        <label class="control-label" for="frm_email_to">To</label>
+                                        <div class="controls">
+                                            <input type="text" id="frm_email_to" name="frm_email_to" placeholder="Type recipient's email" class="input-xlarge" value="<?php if ($_REQUEST['frm_email_to']) { echo stripslashes($_REQUEST['frm_email_to']); } ?>" data-validation="validate_email" /> * 
+                                            <p class="help-block"></p>
+                                        </div>
+                                    </div>
+    
+                                    <!-- Additional Message -->
+                                    <div class="control-group">
+                                        <label class="control-label" for="frm_message">Additional message</label>
+                                        <div class="controls">
+                                            <textarea id="frm_message" name="frm_message" placeholder="Type additional message to the recipient" class="input-xlarge" value="<?php if ($_REQUEST['frm_message']) { echo stripslashes($_REQUEST['frm_message']); } ?>" row="3" data-validation="" /></textarea> (optional) 
+                                            <p class="help-block"></p>
+                                        </div>
+                                    </div>
+    
+                                    <!-- Send a Copy -->
+                                    <div class="control-group">
+                                        <label class="control-label" for="frm_send_copy">Send me a copy</label>
+                                        <div class="controls">
+                                            <input type="checkbox" id="frm_send_copy" name="frm_send_copy" value="yes" /> (optional) 
+                                            <p class="help-block">Check to send a copy to my email: <?php echo $strEmail; ?></p>
+                                        </div>
+                                    </div>	
+    
+                                    <div class="control-group">									
+                                        <div class="controls">
+                                            <button class="btn btn-submit" type="button">Send</button>
+                                        </div>
+                                    </div>
+    
+                                </fieldset>
+                            </form>
+                          </div>
+                          <div class="tab-pane" id="preview-sendtoemail">
+                          	<div class="alert">Preview</div>
+                            
+                            <div>
+                            	<div id="message-container"></div>
+								<?php echo file_get_contents($STR_URL . 'booking_list_print.php?action=print&print=false&pop=yes');?>
+                            </div>
+                          </div>
+                        </div>
+                        
 					</div>
-				</div>			
-		   		
+				</div>
+                
 
 			</div>	<!-- end #box -->	
 				
@@ -135,6 +152,11 @@
 				$("#frm_email_to").focus();
 			}		
 
+		});
+		
+		$("#frm_message").on('keyup', function(){
+			var value = $(this).val();
+			$("#message-container").html("<p>"+value+"</p>");
 		});
 	});
 </script>

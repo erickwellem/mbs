@@ -7,11 +7,11 @@
  * 		
  * @Desc: Process file using Ajax
  **************************************************************************************************/
-session_start();
 include('../config.php');
 require_once('../lib/db.php');
 require_once('../lib/admin.php');
 require_once('../lib/html.php');
+session_start();
 
 $db = new DB();
 $admin = new ADMIN();

@@ -562,6 +562,13 @@ a.link_proc {
 	color: #ccc;
 }
 
+#status_message {
+	padding: 10px;
+	margin: 10px 0;
+}
+
+
+
 /* DATA TABLE ---------------------------- */
 .datatable table {
   border-collapse: collapse;

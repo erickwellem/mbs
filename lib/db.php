@@ -12,7 +12,7 @@ class DB
 	
 	var $conn; 
 	
-	function dbConnect() 
+	static function dbConnect() 
 	{
 		
 		global $DB_HOST;
@@ -52,7 +52,7 @@ class DB
 		
 	} // getSiteConfig()
 	
-	function dbFieldToID($tableName, $fieldName, $fieldValue, $IDName) 
+	static function dbFieldToID($tableName, $fieldName, $fieldValue, $IDName) 
 	{		
 		DB::dbConnect();
 		
@@ -67,7 +67,7 @@ class DB
 		
 	} // dbFieldToID()
 	
-	function dbIDToField ($tableName, $IDName, $IDValue, $fieldName) 
+	static function dbIDToField ($tableName, $IDName, $IDValue, $fieldName) 
 	{
 		DB::dbConnect();		
 		
@@ -227,22 +227,33 @@ class DB
 			
 			$strImagePath = 'uploads/user/';
 			$strNewFileName = 'user_' . date('YmdHis');
+			$strNewFileNameOri = 'user_' . date('YmdHis') . '_ori';
 		
 			switch ($_FILES['frm_user_photo']['type']) 
 			{
 				case 'image/pjpeg' : $strNewFileName .= '.jpg';
+									 $strNewFileNameOri .= '.jpg';	
+									 $strImageType = 'jpg';
 					break;
 				case 'image/jpeg' : $strNewFileName .= '.jpg';
+									$strNewFileNameOri .= '.jpg';		
+									$strImageType = 'jpg';
 					break;
 				case 'image/x-png' : $strNewFileName .= '.png';
+									 $strNewFileNameOri .= '.png';		
+									 $strImageType = 'png';
 					break;
 				case 'image/png' : $strNewFileName .= '.png';
+								   $strNewFileNameOri .= '.png';	 
+								   $strImageType = 'png';
 					break;
 				case 'image/gif' : $strNewFileName .= '.gif';
+								   $strNewFileNameOri .= '.gif';	
+								   $strImageType = 'gif';
 					break;
 			}
 			
-			@copy($_FILES['frm_user_photo']['tmp_name'], $strImagePath . $strNewFileName);
+			@copy($_FILES['frm_user_photo']['tmp_name'], $strImagePath . $strNewFileNameOri);
 			
 		} 
 		
@@ -250,7 +261,25 @@ class DB
 		{
 			$strNewFileName = '';
 		}
+
+
+		HTML::resizeImage($strImagePath . $strNewFileNameOri, $strImagePath . $strNewFileName, $strImageType, 150, 150);
 		
+		
+		// subscription start date
+		if ($_REQUEST['frm_user_subscription_start'])
+		{
+			$arrSDates = explode('-', $_REQUEST['frm_user_subscription_start']);
+			$strSDate = $arrSDates[2] . '-' . $arrSDates[1] . '-' . $arrSDates[0];
+		}
+
+		// subscription end date
+		if ($_REQUEST['frm_user_subscription_end'])
+		{
+			$arrEDates = explode('-', $_REQUEST['frm_user_subscription_end']);
+			$strEDate = $arrEDates[2] . '-' . $arrEDates[1] . '-' . $arrEDates[0];
+		}
+
 
 		$query = "INSERT INTO `users` (`user_id`, 
 										`user_login_name`, 
@@ -279,8 +308,8 @@ class DB
 										'" . mysql_real_escape_string($_REQUEST['frm_user_full_name']) . "', 
 										'" . mysql_real_escape_string($_REQUEST['frm_user_email']) . "', 
 										'" . $strNewFileName . "', 
-										'" . $_REQUEST['frm_user_subscription_start_year'] . "-" . $_REQUEST['frm_user_subscription_start_month'] . "-" . $_REQUEST['frm_user_subscription_start_day'] . "', 
-										'" . $_REQUEST['frm_user_subscription_end_year'] . "-" . $_REQUEST['frm_user_subscription_end_month'] . "-" . $_REQUEST['frm_user_subscription_end_day'] . "', 
+										'" . mysql_real_escape_string($strSDate) . "', 
+										'" . mysql_real_escape_string($strEDate) . "', 
 										'" . mysql_real_escape_string($_REQUEST['frm_user_description']) . "', 
 										'0000-00-00 00:00:00', 
 										'', 
@@ -1586,7 +1615,9 @@ class DB
 	{
 		$this->conn = DB::dbConnect();
 		
-		$query = "SELECT * FROM `mbs_activities` ORDER BY `activity_store_related` DESC, `activity_name`";
+		$intYear = date("Y");
+		
+		$query = "SELECT * FROM `mbs_activities` where `year`='$intYear' ORDER BY `activity_store_related` DESC, `activity_name`";
 		$result = mysql_query($query, $this->conn);
 		
 		if ($result) 
@@ -1745,7 +1776,7 @@ class DB
 			$data = array();
 			while ($row = mysql_fetch_assoc($result)) 
 			{
-				$data[$row['store_id']] = array('store_name'=>$row['store_name']);
+				$data[$row['store_id']] = array('store_id'=>$row['store_id'],'store_name'=>$row['store_name']);
 			}
 			
 			return $data;
@@ -1875,7 +1906,7 @@ class DB
 		if (!$intMonth) { $intYear = date('n'); }
 
 		//-- Special for Gondola End (1 store for 12 months) ID 89
-		if ($intActivityID == 89)
+		if ($intActivityID == 89 || $intActivityID == 128 || $intActivityID == 164)
 		{
 
 			$strDateTime = $intYear . "-" . $intMonth . "-" . "01";
@@ -1906,22 +1937,28 @@ class DB
 			if ($intYear) { $query .= " AND `booking_activity_year` = '" . $intYear . "' "; }	
 			if ($intMonth) { $query .= " AND `booking_activity_month` = '" . $intMonth . "' "; }	      
 
-			$query .= " LIMIT 1";
+			$query .= " ";
 		}
 
 		#echo $query."<br />";
-		$result = mysql_query($query, $this->conn);	
+		$result = mysql_query($query, $this->conn);
+		$numRows = mysql_num_rows($result);
+		
+		return $numRows;
 
-		if ($result)
+		if ($numRows)
 		{
 			$row = mysql_fetch_assoc($result);
-
+			//echo $query."<br>";
 			return $row;
 		}
 
+
+		
+
 	} // checkActivityInStoreByDateTime($intActivityID, $intStoreID, $intYear=NULL, $intMonth=NULL)
 
-
+	
 	function getActivityInStoreTotalByDateTime($intActivityID, $intYear=NULL, $intMonth=NULL)
 	{
 		$this->conn = DB::dbConnect();
@@ -1930,7 +1967,7 @@ class DB
 		if (!$intMonth) { $intYear = date('n'); }
 
 		//-- Special for Gondola End (1 store for 12 months) ID 89
-		if ($intActivityID == 89)
+		if ($intActivityID == 89 || $intActivityID == 128 || $intActivityID == 164)
 		{
 			$strDateTime = $intYear . "-" . $intMonth . "-" . "01";
 
@@ -2176,9 +2213,459 @@ class DB
 		}
 
 	} // getProductsInActivity($intBookingActivityID)
+	
+	function getDepartmentData()
+	{
+		$this->conn = DB::dbConnect();
+		
+		$query = "SELECT * FROM `mbs_departments` ORDER BY `department_name`";
+		$result = mysql_query($query, $this->conn);
+		
+		if ($result) 
+		{
+			$data = array();
+			while ($row = mysql_fetch_assoc($result)) 
+			{
+				$data[$row['department_id']] = array('department_name'=>$row['department_name']);
+			}
+			
+			return $data;
+		}
+		
+	} // getDepartmentData()
+	
+	function bookingCopy($intBookingId = NULL){
+		if($intBookingId){
+			
+			$this->conn = DB::dbConnect();
+			$html = new HTML();
+		
+			$query = "SELECT * FROM `mbs_bookings` WHERE `booking_id` = '$intBookingId'";
+			$resultSelectBooking = mysql_query($query, $this->conn);
+			$row = mysql_fetch_assoc($resultSelectBooking);
+			
+			$strBookingCode = $html->generateBookingCode();
+			$query = "INSERT INTO `mbs_bookings` 
+								(`booking_id`, 
+								 `supplier_id`, 
+								 `booking_code`, 
+								 `booking_name`, 
+								 `booking_date`, 
+								 `booking_supplier_name`, 
+								 `booking_supplier_po_ref_number`, 
+								 `booking_total`, 
+								 `booking_description`, 
+								 `booking_file_name`, 
+								 `booking_file_path`, 
+								 `booking_active`, 
+								 `booking_created_date`, 
+								 `booking_created_by`, 
+								 `booking_modified_date`, 
+								 `booking_modified_by`) 
+		
+						VALUES (NULL, 
+								 '" . $row['supplier_id'] . "', 
+								 '" . $strBookingCode . "', 
+								 'Booking " . $strBookingCode . " For ". $row['booking_supplier_name'] ."', 
+								 '" . $row['booking_date'] . "', 
+								 '" . $row['booking_supplier_name'] . "', 
+								 '" . $row['booking_supplier_po_ref_number'] . "', 
+								 '" . $row['booking_total'] . "', 
+								 'Booking For ". $row['booking_supplier_name'] ."', 
+								 '', 
+								 '', 
+								 '" . $row['booking_active'] . "', 
+								 '" . date('Y-m-d H:i:s') . "', 
+								 '" . $_SESSION['user']['login_name'] . "',
+								 '" . date('Y-m-d H:i:s') . "', 
+								 '" . $_SESSION['user']['login_name'] . "')";
+		
+			$resultInsertBooking = mysql_query($query, $this->conn);
+			$intNewBookingID = mysql_insert_id();
+			
+			if($resultInsertBooking){
+				$query = "SELECT * FROM `mbs_bookings_activities` WHERE `booking_id` = '$intBookingId'";
+				$resultSelectActivities = mysql_query($query, $this->conn);
+				
+				while($row = mysql_fetch_assoc($resultSelectActivities)){
+					$intActivityOldID = $row['booking_activity_id'];
+					
+					$query = "INSERT INTO `mbs_bookings_activities` (
+								`booking_activity_id`, 
+								`booking_id`, 
+								`activity_id`, 
+								`size_id`, 
+								`store_id`, 																			
+								`booking_activity_year`, 
+								`booking_activity_month`, 
+								`booking_activity_description`, 
+								`booking_activity_price`, 
+								`booking_activity_price_total`, 
+								`booking_activity_due_date`, 
+								`booking_activity_created_date`, 
+								`booking_activity_created_by`, 
+								`booking_activity_modified_date`, 
+								`booking_activity_modified_by`) 
+								
+							  VALUES (NULL,
+								'" . $intNewBookingID . "', 
+								'" . $row['activity_id'] . "', 
+								'" .  $row['size_id'] . "', 
+								'" . $row['store_id'] . "', 																			
+								'" . $row['booking_activity_year'] . "', 
+								'" . $row['booking_activity_month'] . "', 
+								'" . $row['booking_activity_description'] . "',
+								'" . $row['booking_activity_price'] . "', 
+								'" . $row['booking_activity_price_total'] . "', 	
+								 " . $row['booking_activity_due_date'] .", 
+								'" . date('Y-m-d H:i:s') . "', 
+								'" . $_SESSION['user']['login_name'] . "',
+								'" . date('Y-m-d H:i:s') . "', 
+								'" . $_SESSION['user']['login_name'] . "');";
 
+					$resultInsertActivities = mysql_query($query);
+					$intActivityNewID = mysql_insert_id();
+					
+					if($resultInsertActivities){
+						$query = "SELECT * FROM `mbs_bookings_products` WHERE `booking_activity_id` = '$intActivityOldID'";
+						$resultSelectProducts = mysql_query($query, $this->conn);
+						
+						while($row = mysql_fetch_assoc($resultSelectProducts)){
+							$query = "INSERT INTO `mbs_bookings_products` (`booking_product_id`, 
+										`booking_id`, 
+										`booking_activity_id`,
+										`booking_department_id`, 
+										`booking_product_code`, 
+										`booking_product_name`, 																	
+										`booking_product_normal_retail_price`, 
+										`booking_product_promo_price`, 
+										`booking_product_cost_price`, 
+										`booking_product_recommended_retail_price`, 
+										`booking_product_special_offer_details`, 
+										`booking_product_description`, 
+										`booking_product_created_date`, 
+										`booking_product_created_by`, 
+										`booking_product_modified_date`, 
+										`booking_product_modified_by`) 
+								 VALUES (NULL, 
+										'" . $intNewBookingID . "', 
+										'" . $intActivityNewID . "', 
+										'" . $row['booking_department_id'] . "', 
+										'" . $row['booking_product_code'] . "', 
+										'" . $row['booking_product_name'] . "', 
+										'" . $row['booking_product_normal_retail_price'] . "', 
+										'" . $row['booking_product_promo_price'] . "', 
+										'" . $row['booking_product_cost_price'] . "', 
+										'" . $row['booking_product_recommended_retail_price'] . "', 
+										'" . $row['booking_product_special_offer_details'] . "', 
+										'" . $row['booking_product_description'] . "',
+										'" . date('Y-m-d H:i:s') . "', 
+										'" . $_SESSION['user']['login_name'] . "',
+										'" . date('Y-m-d H:i:s') . "', 
+										'" . $_SESSION['user']['login_name'] . "')";	
+
+							$resultInsertProducts = mysql_query($query);
+							$intID = mysql_insert_id();
+						}
+					}
+				}
+				return $intNewBookingID;
+			}else{
+				return FALSE;
+			}
+		}
+	} // bookingCopy()
+	
+	function getSupplierAccount($intSupplierId){
+		$conn = DB::dbConnect();
+		
+		$query = "SELECT * FROM `mbs_suppliers` 
+						INNER JOIN `mbs_suppliers_marketing_contacts` 
+							ON mbs_suppliers.supplier_id=mbs_suppliers_marketing_contacts.supplier_id 
+					WHERE `mbs_suppliers`.`supplier_id` = '$intSupplierId' LIMIT 1";
+		$resultSelectSupplier = mysql_query($query, $conn);
+		$row = mysql_fetch_assoc($resultSelectSupplier);
+		
+		return $row;
+		
+	} // getSupplierAccount()
+
+	function checkSupplierCatalogueStock($intSupplierId, $text, $strYear, $strMonth){
+		$conn = DB::dbConnect();
+		
+		$maxSpot = 384;
+		$spot;
+		$theme;
+
+		if(strpos($text, "Catalogue - IN 2 Health")!==false){
+			$theme = "Catalogue - IN 2 Health";
+		}else if(strpos($text, "Catalogue - Pharmacy4Less")!==false){
+			$theme = "Catalogue - Pharmacy4Less";
+		}else if(strpos($text, "Catalogue - Roy Young")!==false){
+			$theme = "Catalogue - Roy Young";
+		}else if(strpos($text, "Themed Catalogue - Pharmacy4Less")!==false){
+			$theme = "Themed Catalogue - Pharmacy4Less";
+		}else if(strpos($text, "Themed Catalogue - Roy Young")!==false){
+			$theme = "Themed Catalogue - Roy Young";
+		}
+
+		if(strpos($text, "Double Spot")!==false){
+			$spot = 2;
+		}else if(strpos($text, "Full Page")!==false){
+			$spot = 16;
+		}else if(strpos($text, "8 Spots")!==false){
+			$spot = 8;
+		}else if(strpos($text, "4 Spots")!==false){
+			$spot = 4;
+		}else if(strpos($text, "Single Spot")!==false){
+			$spot = 1;
+		}else if(strpos($text, "Themed Supplementary")!==false){
+			$spot = 2;
+		}
+
+		$query = "SELECT 
+					SUM(
+						CASE
+				    		WHEN LOCATE('Double Spot',activity.activity_name)>0 THEN '2'
+							WHEN LOCATE('Full Page',activity.activity_name)>0 THEN '16'
+							WHEN LOCATE('8 Spots',activity.activity_name)>0 THEN '8'
+							WHEN LOCATE('4 Spots',activity.activity_name)>0 THEN '4'
+							WHEN LOCATE('Single Spot',activity.activity_name)>0 THEN '1'
+							WHEN LOCATE('Themed Supplementary',activity.activity_name)>0 THEN '2'
+				    	END
+					) AS stock
+				FROM 
+					mbs_bookings_activities AS booking 
+				INNER JOIN 
+					mbs_activities AS activity 
+					ON activity.activity_id = booking.activity_id 
+				WHERE 
+					activity.activity_name like '%".$theme."%'
+					AND booking_activity_month = '".$strMonth."' 
+					AND booking_activity_year = '".$strYear."'";
+		$result = mysql_query($query, $conn);
+		$row = mysql_fetch_assoc($result);
+		
+		if($row['stock'] + $spot <= 384){
+			return TRUE;
+		}else{
+			return FALSE;
+		}
+	}
+
+	function insertEmail()
+	{
+		
+		$this->conn = $this->dbConnect();
+				
+		$query = "INSERT INTO `mbs_emails` (`email_id`,
+											`store_id`, 
+											`email_name`, 
+											 `email_address`, 											  
+										     `email_created_date`, 
+											 `email_created_by`, 
+											 `email_modified_date`, 
+											 `email_modified_by`
+									  		 )
+								VALUES (NULL , 
+										'" . mysql_real_escape_string($_REQUEST['frm_store_id']) . "',
+										'" . mysql_real_escape_string($_REQUEST['frm_email_name']) . "', 
+										'" . mysql_real_escape_string($_REQUEST['frm_email_address']) . "', 
+		
+										NOW( ) , 
+										'" . mysql_real_escape_string($_SESSION['user']['login_name']) . "', 
+										NOW( ) , 
+										'" . mysql_real_escape_string($_SESSION['user']['login_name']) . "'
+										);";
+						
+		
+			$result = mysql_query($query, $this->conn);
+			$intEmailID = mysql_insert_id();
+		
+		#echo $query;
+		if ($result) 
+		{
+			
+	
+			$strAlert = "Email Address <strong>\"" . stripslashes($_REQUEST['frm_email_address']) . "\"</strong> is successfully added!";
+			$strAlert .= "<br /><br />\n";
+			if (ADMIN::getModulePrivilege('email', 'view') > 0) { $strAlert .= "<a href=\"email_view.php?email_id=". $intEmailID . "\" title=\"View Email\"><img src=\"img/view_icon.png\" /> View</a>&nbsp;&nbsp;&nbsp;\n"; }
+			if (ADMIN::getModulePrivilege('email', 'edit') > 0) { $strAlert .= "<a href=\"email_edit.php?email_id=" . $intEmailID . "\" title=\"Edit Email\"><img src=\"img/edit_icon.png\" /> Edit</a>&nbsp;&nbsp;&nbsp;\n"; }
+			if (ADMIN::getModulePrivilege('email', 'delete') > 0) { $strAlert .= "<a href=\"email_delete.php?email_id=" . $intEmailID . "&action=delete\" title=\"Delete Email\" onclick=\"return confirmDeleteEmail(this.form)\"><img src=\"img/delete_icon.png\" /> Delete</a>&nbsp;&nbsp;&nbsp;\n"; }
+			
+			$strAlert .= "<br /><br />\n";
+			
+			if (ADMIN::getModulePrivilege('email', 'add') > 0) { $strAlert .= "<a href=\"email_add.php\" title=\"Add Email\"><img src=\"img/add_icon.png\" /> Add</a>&nbsp;&nbsp;&nbsp;\n"; }
+			if (ADMIN::getModulePrivilege('email', 'list') > 0) { $strAlert .= "<a href=\"email_list.php\" title=\"User Email\"><img src=\"img/list_icon.png\" /> List</a>&nbsp;&nbsp;&nbsp;\n"; }
+			
+			
+			
+			$strLog = "Email <strong>\"" . stripslashes($_REQUEST['frm_email_address']) . "\"</strong> is successfully added.";
+			
+			$queryLog = "INSERT INTO `logs` (`log_id`, 
+										     `log_user`, 
+										     `log_action`, 
+										     `log_time`, 
+										     `log_from`, 
+										     `log_logout`)
+
+						VALUES (NULL, 
+								'" . $_SESSION['user']['login_name'] . "',
+							    '" . mysql_real_escape_string($strLog) . "',
+								NOW( ),
+								'" . $_SESSION['user']['ip_address'] . "', 
+								NULL)";
+			
+			$resultLog = mysql_query($queryLog, $this->conn);
+			
+			HTML::showAlert($strAlert, FALSE);			
+			
+		} 
+		
+		else 
+		{			
+			HTML::showAlert("Query error on the database: Email!", FALSE);			
+		}
+		
+		
+	} // insertEmail()
+
+	function updateEmail()
+	{
+		
+		$this->conn = $this->dbConnect();
+				
+		$query = "UPDATE `mbs_emails` SET `store_id` = '" . mysql_real_escape_string($_REQUEST['frm_store_id']) . "', 											
+										   `email_name` = '" . mysql_real_escape_string($_REQUEST['frm_email_name']) . "', 
+										   `email_address` = '" . mysql_real_escape_string($_REQUEST['frm_email_address']) . "', 
+										   `email_modified_date` = NOW( ), 
+										   `email_modified_by` = '" . mysql_real_escape_string($_SESSION['user']['login_name']) . "'
+										WHERE
+											`email_id` = '" . $_REQUEST['frm_email_id'] . "' LIMIT 1";
+								
+			$result = mysql_query($query, $this->conn);
+			$intEmailID = $_REQUEST['frm_email_id'];
+		
+		#echo $query;
+		if ($result) 
+		{			
+
+			$strAlert = "Email <strong>\"" . stripslashes($_REQUEST['frm_email_address']) . "\"</strong> is successfully updated!";
+			$strAlert .= "<br /><br />\n";
+			if (ADMIN::getModulePrivilege('emails', 'view') > 0) { $strAlert .= "<a href=\"email_view.php?email_id=". $intEmailID . "\" title=\"View Email\"><img src=\"img/view_icon.png\" /> View</a>&nbsp;&nbsp;&nbsp;\n"; }
+			if (ADMIN::getModulePrivilege('emails', 'edit') > 0) { $strAlert .= "<a href=\"email_edit.php?email_id=" . $intEmailID . "\" title=\"Edit Email\"><img src=\"img/edit_icon.png\" /> Edit</a>&nbsp;&nbsp;&nbsp;\n"; }
+			if (ADMIN::getModulePrivilege('emails', 'delete') > 0) { $strAlert .= "<a href=\"email_delete.php?email_id=" . $intEmailID . "&action=delete\" title=\"Delete Email\" onclick=\"return confirmDeleteUserGroup(this.form)\"><img src=\"img/delete_icon.png\" /> Delete</a>&nbsp;&nbsp;&nbsp;\n"; }
+			
+			$strAlert .= "<br /><br />\n";
+			
+			if (ADMIN::getModulePrivilege('emails', 'add') > 0) { $strAlert .= "<a href=\"email_add.php\" title=\"Add Email\"><img src=\"img/add_icon.png\" /> Add</a>&nbsp;&nbsp;&nbsp;\n"; }
+			if (ADMIN::getModulePrivilege('emails', 'list') > 0) { $strAlert .= "<a href=\"email_list.php\" title=\"Email List\"><img src=\"img/list_icon.png\" /> List</a>&nbsp;&nbsp;&nbsp;\n"; }
+			
+			$strLog = "Email \"" . stripslashes($_REQUEST['frm_email_address']) . "\" is successfully updated!";
+			
+			$queryLog = "INSERT INTO `logs` (`log_id`, 
+										     `log_user`, 
+										     `log_action`, 
+										     `log_time`, 
+										     `log_from`, 
+										     `log_logout`)
+
+						VALUES (NULL, 
+								'" . $_SESSION['user']['login_name'] . "',
+							    '" . mysql_real_escape_string($strLog) . "',
+								NOW( ),
+								'" . $_SESSION['user']['ip_address'] . "', 
+								NULL)";
+			
+			$resultLog = mysql_query($queryLog, $this->conn);
+			
+			HTML::showAlert($strAlert, FALSE);			
+			
+		} 
+		else 
+		
+		{		
+			HTML::showAlert("Query error on the database: UserGroup!", FALSE);			
+		}
+		
+		
+	} // updateEmail()
+
+	function deleteEmail() 
+	{
+		
+		$this->conn = $this->dbConnect();
+		
+		$query = "SELECT * FROM `mbs_emails` WHERE `email_id` = '" . $_REQUEST['email_id'] . "' LIMIT 1";
+		$result = mysql_query($query, $this->conn);
+		$row = mysql_fetch_assoc($result);
+		
+		
+		if ($row)
+		{
+			// delete user group
+			$queryDel = "DELETE FROM `mbs_emails` WHERE `email_id` = '" . $_REQUEST['email_id'] . "' LIMIT 1";
+			$resultDel = mysql_query($queryDel, $this->conn);
+				
+			if ($resultDel) 
+			{
+				
+
+				$strAlert = "Email <strong>\"" . stripslashes($row['email_address']) . "\"</strong> is successfully deleted!";
+				$strAlert .= "<br /><br />\n";			
+				
+				if (ADMIN::getModulePrivilege('emails', 'add') > 0) { $strAlert .= "<a href=\"email_add.php\" title=\"Add Email\"><img src=\"img/add_icon.png\" /> Add</a>&nbsp;&nbsp;&nbsp;\n"; }
+				if (ADMIN::getModulePrivilege('emails', 'list') > 0) { $strAlert .= "<a href=\"email_list.php\" title=\"Email List\"><img src=\"img/list_icon.png\" /> List</a>&nbsp;&nbsp;&nbsp;\n"; }
+				
+				$strLog = "Email \"" . stripslashes($row['email_address']) . "\" is successfully deleted.";
+				
+				$queryLog = "INSERT INTO `logs` (`log_id`, 
+											     `log_user`, 
+											     `log_action`, 
+											     `log_time`, 
+											     `log_from`, 
+											     `log_logout`)
+	
+							VALUES (NULL, 
+									'" . $_SESSION['user']['login_name'] . "',
+								    '" . mysql_real_escape_string($strLog) . "',
+									NOW( ),
+									'" . $_SESSION['user']['ip_address'] . "', 
+									NULL)";			
+				
+				$resultLog = mysql_query($queryLog, $this->conn);
+				
+				HTML::showAlert($strAlert, FALSE);
+				
+				
+			}
+		
+		}
+		
+		else 
+		{
+			$strAlert = "Email <strong>\"" . stripslashes($row['email_address']) . "\"</strong> tidak kosong!";
+			$strAlert .= "<br /><br />\n";						
+			if (ADMIN::getModulePrivilege('emails', 'list') > 0) { $strAlert .= "<a href=\"email_list.php\" title=\"Email List\"><img src=\"img/list_icon.png\" /> List</a>&nbsp;&nbsp;&nbsp;\n"; }
+			HTML::showAlert($strAlert, FALSE);
+		}
+		
+		
+		
+	}  //deleteEmail()
+
+	function getListEmail($intStoreID){
+		$query = "SELECT * FROM mbs_emails WHERE store_id = '$intStoreID'";
+		$result = mysql_query($query);
+		$array = array();
+		while($row = mysql_fetch_assoc($result)){
+			$array[] = $row['email_address'];
+		}
+		return $array;
+	}
 
 	
+
 } // end of class DB
 
 ?>

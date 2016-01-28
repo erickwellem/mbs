@@ -114,6 +114,15 @@
                             </ul>
                         </li>
                         <?php } ?>
+
+                        <?php if ($admin->getModuleFile('emails', 'list') !== 0) { ?>
+                        <li><a href="<?php echo $STR_URL; ?>#">Emails</a>
+                          <ul>
+                              <?php if ($admin->getModuleFile('emails', 'add') !== 0) { ?><li><a href="<?php echo $STR_URL; ?><?php echo $admin->getModuleFile('emails', 'add'); ?>">New Email</a></li><?php } ?>
+                                <?php if ($admin->getModuleFile('emails', 'list') !== 0) { ?><li><a href="<?php echo $STR_URL; ?><?php echo $admin->getModuleFile('emails', 'list'); ?>">Email List</a></li><?php } ?>                                
+                            </ul>
+                        </li>
+                        <?php } ?>
                         
                         <?php if ($admin->getModuleFile('logs', 'list') !== 0) { ?><li><a href="<?php echo $STR_URL; ?><?php echo $admin->getModuleFile('logs', 'list'); ?>">System Log</a></li><?php } ?>
                         <?php if ($admin->getModuleFile('settings', 'list') !== 0) { ?><li><a href="<?php echo $STR_URL; ?><?php echo $admin->getModuleFile('settings', 'list'); ?>">Configuration Settings</a></li><?php } ?>

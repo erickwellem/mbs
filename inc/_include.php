@@ -10,7 +10,6 @@
 	require_once('lib/db.php');
 	require_once('lib/html.php');
 	
-
 	// Includes
 	$HEADER_INCLUDE = 'inc/header-default.php';
 	$FOOTER_INCLUDE = 'inc/footer-default.php';

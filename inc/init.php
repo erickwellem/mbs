@@ -1,3 +1,4 @@
+    <?php if(!isset($_REQUEST['pop'])):?>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
 	<meta http-equiv="Content-Language" content="en" />
@@ -36,7 +37,7 @@
     <script src="<?php echo $STR_URL; ?>js/jquery-1.9.0.min.js"></script>
     <!-- Colorbox -->
     <script src="<?php echo $STR_URL; ?>js/jquery.colorbox.js"></script>
-
+    <?php endif;?>
     <?php 
     
     if (class_exists('ADMIN')) { $admin = new ADMIN(); } 

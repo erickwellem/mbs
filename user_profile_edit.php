@@ -96,7 +96,7 @@
             <div id="box" class="span12">
 	       	        	
 
-				<form id="frm_profile_edit" enctype="multipart/form-data" method="post" action="user_profile_edit_exec.php">
+				<form id="frm_profile_edit" class="form-horizontal" enctype="multipart/form-data" method="post" action="user_profile_edit_exec.php">
 				<input type="hidden" name="frm_action" value="edit" />
 				<input type="hidden" name="frm_user_id" value="<?php echo $_SESSION['user']['id']; ?>" />
 				
@@ -105,22 +105,25 @@
 			      <legend class="">Edit Profile</legend>
 			    </div>
 
-			    <div style="float:right;">
-				<?php 
-					if ($row['user_photo']) 
-					{ 
-						?>
-						<img src="uploads/user/<?php echo $row['user_photo']; ?>" class="img-circle" style="width:100px; margin-right:8px; border-top: 1px solid #ccc; border-right: 2px solid #999; border-bottom: 2px solid #999; border-left: 1px solid #ccc; padding: 3px;" />
-						<br /><br />
-						<a class="btn" href="<?php echo $_SERVER['PHP_SELF']; ?>?user_id=<?php echo $_SESSION['user']['id']; ?>&action=del_image" onclick="return confirmDeletePhoto(this.form)"><img src="img/delete_icon.png" /> Delete Photo</a>
-						<?php
-					}
+			    <div class="control-group">
+			    	<label class="control-label" for="frm_user_photo">Photo</label>
+			      	<div class="controls">	
+					<?php 
+						if ($row['user_photo']) 
+						{ 
+							?>
+							<img src="uploads/user/<?php echo $row['user_photo']; ?>" class="img-circle" style="width:100px; margin-right:8px; border-top: 1px solid #ccc; border-right: 2px solid #999; border-bottom: 2px solid #999; border-left: 1px solid #ccc; padding: 3px;" />
+							<br /><br />
+							<a class="btn" href="<?php echo $_SERVER['PHP_SELF']; ?>?user_id=<?php echo $_SESSION['user']['id']; ?>&action=del_image" onclick="return confirmDeletePhoto(this.form)"><img src="img/delete_icon.png" /> Delete Photo</a>
+							<?php
+						}
 
-					else 
-					{ 
-						echo $row['user_photo']; 
-					} 
-				?>
+						else 
+						{ 
+							echo $row['user_photo']; 
+						} 
+					?>
+					</div>
 				</div>
 
 				<div class="control-group">
@@ -174,7 +177,12 @@
 				</div>
 				
 				<br />
-				<span>*) Required</span>
+				<div class="control-group">				    
+				    <label class="control-label"></label>
+				    <div class="controls">
+						<span>*) Required</span>
+					</div>
+				</div>
 				</fieldset>
 				</form>
 				
